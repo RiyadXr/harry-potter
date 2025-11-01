@@ -1,20 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { House, SortingResult } from '../types';
 
-export const getSortingHatDecision = async (answers: string[]): Promise<SortingResult> => {
+export const getSortingHatDecision = async (answers: string[], apiKey: string): Promise<SortingResult> => {
     
-    // Safely get the API key from the environment, preventing a crash if 'process' is not defined.
-    const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-
     if (!apiKey) {
-        console.error("API key not found. Please set the API_KEY environment variable.");
+        console.error("API key was not provided to the Sorting Hat.");
         return {
-            house: House.Hufflepuff, // Default to a house for a graceful failure
+            house: House.Hufflepuff,
             reasoning: "The Sorting Hat's connection is weak. The Headmaster must provide the secret key (API_KEY) to the castle's magic."
         };
     }
     
-    // Initialize the AI client only when it's needed and the key exists.
     const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
