@@ -73,6 +73,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                 <Modal title="A Challenge Appears!" onClose={handleCloseModal} theme={theme} showFooterButton={false}>
                     <form onSubmit={handleTriviaSubmit}>
                         <p className="mb-4">{currentQuestion.question}</p>
+
                         <div className="space-y-2 mb-4">
                             {currentQuestion.options.map(option => (
                                 <label key={option} className="flex items-center p-3 rounded-lg bg-black/20 cursor-pointer">
@@ -88,7 +89,15 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                                 </label>
                             ))}
                         </div>
-                        <div className="text-center">
+                        <div className="flex justify-center items-center space-x-4">
+                            <button
+                                type="button"
+                                onClick={handleCloseModal}
+                                disabled={!!feedback}
+                                className={`px-6 py-2 rounded-lg shadow-md transition-all ${!!feedback ? 'bg-gray-500 cursor-not-allowed' : `${theme.secondary} hover:opacity-80`}`}
+                            >
+                                Cancel
+                            </button>
                             <button 
                                 type="submit" 
                                 disabled={!selectedAnswer || !!feedback}
