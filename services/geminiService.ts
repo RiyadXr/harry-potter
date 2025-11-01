@@ -1,22 +1,30 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { House, SortingResult } from '../types';
 
-export async function getSortingHatDecision(answers: string[]): Promise<SortingResult> {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+// FIX: Initialize GoogleGenAI with API key from environment variable as per guidelines.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+export const getSortingHatDecision = async (answers: string[]): Promise<SortingResult> => {
     const prompt = `
-    You are the Sorting Hat from Harry Potter. Based on these personality traits revealed from a quiz, sort the user into one of the four Hogwarts houses: Gryffindor, Hufflepuff, Ravenclaw, or Slytherin.
+        You are the Sorting Hat from Harry Potter.
+        A student has answered the following questions based on their choices with values like 'patience', 'bravery', 'cunning', 'wisdom':
+        1. "You're locked out of a room. Do you..." - Answer: ${answers[0] || 'not answered'}
+        2. "Which magical creature do you find most fascinating?" - Answer: ${answers[1] || 'not answered'}
+        3. "What would you rather be known for?" - Answer: ${answers[2] || 'not answered'}
+        4. "A troll has gone berserk in the dungeons. You..." - Answer: ${answers[3] || 'not answered'}
 
-    The user's answers point towards these characteristics: ${answers.join(', ')}.
-
-    Analyze these traits and make your decision. Provide your decision and a detailed, in-character explanation of why you chose that house for the user. Be wise and thoughtful, like the real Sorting Hat.
+        Based on these answers, sort the student into one of the four Hogwarts houses: Gryffindor, Slytherin, Ravenclaw, or Hufflepuff.
+        Provide your decision and a brief, wise, and slightly poetic reasoning for your choice, as the Sorting Hat would.
+        Return the response in JSON format.
     `;
     
     try {
+        // FIX: Use ai.models.generateContent to query the Gemini API.
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            // FIX: Use a recommended model for text tasks.
+            model: 'gemini-2.5-flash',
             contents: prompt,
+            // FIX: Configure response to be JSON and define a schema for reliable output.
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -24,34 +32,36 @@ export async function getSortingHatDecision(answers: string[]): Promise<SortingR
                     properties: {
                         house: {
                             type: Type.STRING,
-                            description: "The Hogwarts house you have chosen. Must be one of 'Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff'.",
-                            enum: Object.values(House),
+                            description: 'The Hogwarts house.',
+                            // FIX: Provide enum for valid house names to constrain the model's output.
+                            enum: [House.Gryffindor, House.Slytherin, House.Ravenclaw, House.Hufflepuff]
                         },
                         reasoning: {
                             type: Type.STRING,
-                            description: "Your in-character reasoning for sorting the user into this house."
+                            description: 'The reasoning for the sorting decision.'
                         }
                     },
-                    required: ["house", "reasoning"],
+                    required: ['house', 'reasoning']
                 }
             }
         });
 
-        const jsonString = response.text.trim();
-        const result: SortingResult = JSON.parse(jsonString);
+        // FIX: Extract text from response using the .text property as per guidelines.
+        const text = response.text;
+        const result = JSON.parse(text);
 
-        if (!Object.values(House).includes(result.house)) {
-            throw new Error(`Invalid house returned: ${result.house}`);
+        if (Object.values(House).includes(result.house) && typeof result.reasoning === 'string') {
+            return result as SortingResult;
+        } else {
+            console.error("Invalid response format from Gemini:", result);
+            return { house: House.Hufflepuff, reasoning: "The Sorting Hat is feeling indecisive today, but sees a loyal heart. Welcome to Hufflepuff!" };
         }
-        
-        return result;
 
     } catch (error) {
         console.error("Error calling Gemini API:", error);
-        // Fallback in case of API error
         return {
             house: House.Hufflepuff,
-            reasoning: "The magic of the API seems to be on the fritz! But fear not, for every wizard and witch has a place at Hogwarts. For your patience and good nature in the face of this technical trouble, I place you in Hufflepuff! Where they are just and loyal."
+            reasoning: "The connection to the headmaster's office is fuzzy... but I sense great loyalty in you. Better be... Hufflepuff!"
         };
     }
-}
+};

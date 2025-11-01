@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, HouseTheme, House } from '../types';
-import { ICONS } from '../constants';
 
 interface NavigationProps {
     currentView: View;
@@ -9,34 +8,51 @@ interface NavigationProps {
     house: House | null;
 }
 
+const NavButton: React.FC<{
+    label: string;
+    icon: string;
+    view: View;
+    currentView: View;
+    setView: (view: View) => void;
+    theme: HouseTheme;
+}> = ({ label, icon, view, currentView, setView, theme }) => {
+    const isActive = currentView === view;
+    return (
+        <button
+            onClick={() => setView(view)}
+            className={`flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors duration-300 ${isActive ? theme.accent : 'opacity-70'}`}
+        >
+            <span className="text-2xl">{icon}</span>
+            <span className={`text-xs font-magic ${isActive ? 'font-bold' : ''}`}>{label}</span>
+        </button>
+    );
+};
+
+
 const Navigation: React.FC<NavigationProps> = ({ currentView, setView, theme, house }) => {
+    if (!house) return null;
+
     const navItems = [
-        { view: View.Journal, icon: ICONS.JOURNAL, label: 'Journal' },
-        { view: View.Remembrall, icon: ICONS.REMEMBERALL, label: 'Tasks' },
-        { view: View.Decrees, icon: ICONS.DECREES, label: 'Decrees' },
-        { view: View.Potions, icon: ICONS.POTIONS, label: 'Moods' },
-        { view: View.Settings, icon: ICONS.SETTINGS, label: 'Room of Req.' },
+        { label: 'Journal', icon: '📖', view: View.Journal },
+        { label: 'Remembrall', icon: '🔮', view: View.Remembrall },
+        { label: 'Potions', icon: '🧪', view: View.Potions },
+        { label: 'Decrees', icon: '📜', view: View.Decrees },
+        { label: 'Settings', icon: '⚙️', view: View.Settings },
     ];
-    
-    const activeTextClass = house === House.Hufflepuff ? 'text-white' : theme.text;
-    const inactiveTextClass = house === House.Hufflepuff ? theme.text : `${theme.accent} hover:${theme.text}`;
 
     return (
-        <nav className={`fixed bottom-0 left-0 right-0 z-50 p-2 ${theme.secondary} ${theme.border} border-t-2 shadow-lg flex justify-around items-center`}>
-            {navItems.map(item => (
-                <button
-                    key={item.view}
-                    onClick={() => setView(item.view)}
-                    className={`flex flex-col items-center justify-center p-2 w-20 sm:w-24 rounded-lg transition-all duration-300 font-magic transform hover:scale-105 ${
-                        currentView === item.view
-                            ? `${theme.primary} ${activeTextClass} shadow-inner`
-                            : `${inactiveTextClass}`
-                    }`}
-                >
-                    {item.icon}
-                    <span className="mt-1 text-xs text-center">{item.label}</span>
-                </button>
-            ))}
+        <nav className={`fixed bottom-0 left-0 right-0 h-20 shadow-top-lg flex justify-around items-center sm:max-w-4xl sm:mx-auto sm:rounded-b-lg ${theme.primary} ${theme.text}`}>
+           {navItems.map(item => (
+                <NavButton
+                    key={item.label}
+                    label={item.label}
+                    icon={item.icon}
+                    view={item.view}
+                    currentView={currentView}
+                    setView={setView}
+                    theme={theme}
+                />
+           ))}
         </nav>
     );
 };
