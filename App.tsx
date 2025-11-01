@@ -170,6 +170,13 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen">
+            <button
+                onClick={() => window.location.reload()}
+                aria-label="Force refresh page"
+                className="fixed top-4 right-4 z-50 p-2 bg-gray-700/50 backdrop-blur-sm rounded-full shadow-lg cursor-pointer text-2xl hover:bg-gray-700/70 transition-colors"
+            >
+                🔄
+            </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
                 <Header house={house} theme={theme} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all duration-500 ${theme.secondary} ${theme.border} border-2`}>
