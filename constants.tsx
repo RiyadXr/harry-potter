@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { House, HouseTheme, TriviaQuestion, DailyTask } from './types';
 
@@ -60,6 +61,7 @@ export const ICONS = {
     BROOM: <>🧹</>,
     OWL: <>🦉</>,
     TESTS: <>🎓</>,
+    ENVELOPE: <>✉️</>,
 };
 
 export const SORTING_QUIZ_QUESTIONS = [

@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { HouseTheme, House, View, TriviaQuestion } from '../types';
-import { TRIVIA_QUESTIONS } from '../constants';
+import { HouseTheme, House, View } from '../types';
+import { TRIVIA_QUESTIONS, ICONS } from '../constants';
 import Modal from './Modal';
 
 interface SettingsProps {
@@ -11,13 +11,39 @@ interface SettingsProps {
     onLeaveHouse: () => void;
 }
 
+const Sparkles: React.FC = () => {
+    const sparkleData = useMemo(() => Array.from({ length: 12 }).map(() => ({
+        style: {
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 1.5}s`,
+            transform: `scale(${Math.random() * 0.8 + 0.5})`,
+        },
+    })), []);
+
+    return (
+        <div className="absolute inset-0 pointer-events-none">
+            {sparkleData.map((sparkle, i) => (
+                <span
+                    key={i}
+                    className="absolute text-yellow-300 sparkle"
+                    style={sparkle.style}
+                >
+                    {ICONS.SPARKLES}
+                </span>
+            ))}
+        </div>
+    );
+};
+
+
 const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
     const [isTriviaModalOpen, setIsTriviaModalOpen] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState('');
+    const [isLetterOpen, setIsLetterOpen] = useState(false);
 
     const currentQuestion = useMemo(() => {
-        // Pick a new random question each time the modal opens
         return TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)];
     }, [isTriviaModalOpen]);
 
@@ -50,6 +76,18 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
             <h2 className={`text-3xl font-magic mb-6 border-b-2 pb-2 ${theme.border}`}>Room of Requirement</h2>
             
             <div className="space-y-4">
+                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
+                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>A Special Letter</h3>
+                    <p className="mb-3">A message has arrived for you by owl post.</p>
+                    <button 
+                        onClick={() => setIsLetterOpen(true)}
+                        className={`px-4 py-2 rounded-lg shadow-md transition-all ${theme.primary} hover:opacity-80 flex items-center space-x-2`}
+                    >
+                        <span>Open the Letter</span>
+                        <span>{ICONS.ENVELOPE}</span>
+                    </button>
+                </div>
+
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
                     <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Your House</h3>
                     <p>You are currently a proud member of {house ? <strong>{house}</strong> : 'no house yet'}.</p>
@@ -68,6 +106,34 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                     {!house && <p className="mt-2 text-sm opacity-70">You must be sorted into a house first!</p>}
                 </div>
             </div>
+
+            {isLetterOpen && (
+                 <Modal title="A Letter for Onamika" onClose={() => setIsLetterOpen(false)} theme={theme} footerButtonText="Close">
+                    <div className="relative">
+                        <Sparkles />
+                        <div className="max-h-[60vh] overflow-y-auto pr-4 font-serif text-lg italic leading-relaxed">
+                            <p className="mb-4">My dearest Onamika,</p>
+                            <p className="mb-4">
+                                If magic were real beyond books and spells, I think this would be mine — creating something for you. Something born from hundreds of sleepless nights, quiet cups of tea at dawn, and a heart that refused to rest until it found a way to make you smile.
+                            </p>
+                            <p className="mb-4">
+                                You’ve always loved the world of Harry Potter — the stories, the courage, the wonder that makes the impossible feel close. I wanted to build a little piece of that world just for you. Not copied, not imagined, but created with my own hands, with love and courage stitched into every line of code.
+                            </p>
+                            <p className="mb-4">
+                                This app is more than just an app. It’s the result of all the moments I stayed awake thinking of you, all the times I believed that love itself could be a kind of magic. Maybe I haven’t given you something truly special before, but I hope this shows how much you mean to me.
+                            </p>
+                            <p className="mb-4">
+                                You are my spell that never breaks, my Patronus in dark times, the reason I dared to dream a little bigger.
+                            </p>
+                            <p className="mt-8 text-right">
+                                Always,
+                                <br />
+                                Riyad
+                            </p>
+                        </div>
+                    </div>
+                </Modal>
+            )}
 
             {isTriviaModalOpen && (
                 <Modal title="A Challenge Appears!" onClose={handleCloseModal} theme={theme} showFooterButton={false}>
