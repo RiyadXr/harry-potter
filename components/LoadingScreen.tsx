@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 interface LoadingScreenProps {
     userName: string;
 }
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ userName }) => {
-    const [step, setStep] = useState(0);
-
-    useEffect(() => {
-        const timers = [
-            setTimeout(() => setStep(1), 500),
-            setTimeout(() => setStep(2), 1500),
-            setTimeout(() => setStep(3), 2500),
-        ];
-        return () => timers.forEach(clearTimeout);
-    }, []);
-
-    const textClass = "transition-opacity duration-1000";
-
     return (
         <div className="fixed inset-0 bg-[#f3e9d2] flex flex-col items-center justify-center font-magic text-[#4a2c2a] text-center p-4">
-            <p className={`${textClass} ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+            <style>
+                {`
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    .fade-in-1 { animation: fadeIn 0.8s ease-out forwards; }
+                    .fade-in-2 { animation: fadeIn 0.8s ease-out 0.5s forwards; opacity: 0; }
+                    .fade-in-3 { animation: fadeIn 0.8s ease-out 1.0s forwards; opacity: 0; }
+                `}
+            </style>
+            <p className="fade-in-1">
                 I solemnly swear that I, {userName}, am up to no good.
             </p>
-            <div className={`mt-8 text-5xl transition-opacity duration-500 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="mt-8 text-5xl fade-in-2">
                 🐾
             </div>
-            <p className={`mt-8 ${textClass} ${step >= 3 ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="mt-8 fade-in-3">
                 Mischief Managed
             </p>
         </div>

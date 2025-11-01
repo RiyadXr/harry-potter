@@ -1,10 +1,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { House, SortingResult } from '../types';
 
-// FIX: Initialize GoogleGenAI with API key from environment variable as per guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getSortingHatDecision = async (answers: string[]): Promise<SortingResult> => {
+    // FIX: Check for the API key's existence before trying to use it.
+    if (!process.env.API_KEY) {
+        console.error("API key not found. Please set the API_KEY environment variable.");
+        return {
+            house: House.Hufflepuff,
+            reasoning: "The Sorting Hat's connection is weak. Please ensure the Headmaster has provided the secret key to the castle's magic."
+        };
+    }
+    
+    // FIX: Initialize GoogleGenAI inside the function to prevent module-level errors on load.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
     const prompt = `
         You are the Sorting Hat from Harry Potter.
         A student has answered the following questions based on their choices with values like 'patience', 'bravery', 'cunning', 'wisdom':
@@ -19,12 +28,9 @@ export const getSortingHatDecision = async (answers: string[]): Promise<SortingR
     `;
     
     try {
-        // FIX: Use ai.models.generateContent to query the Gemini API.
         const response = await ai.models.generateContent({
-            // FIX: Use a recommended model for text tasks.
             model: 'gemini-2.5-flash',
             contents: prompt,
-            // FIX: Configure response to be JSON and define a schema for reliable output.
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -33,7 +39,6 @@ export const getSortingHatDecision = async (answers: string[]): Promise<SortingR
                         house: {
                             type: Type.STRING,
                             description: 'The Hogwarts house.',
-                            // FIX: Provide enum for valid house names to constrain the model's output.
                             enum: [House.Gryffindor, House.Slytherin, House.Ravenclaw, House.Hufflepuff]
                         },
                         reasoning: {
@@ -46,7 +51,6 @@ export const getSortingHatDecision = async (answers: string[]): Promise<SortingR
             }
         });
 
-        // FIX: Extract text from response using the .text property as per guidelines.
         const text = response.text;
         const result = JSON.parse(text);
 

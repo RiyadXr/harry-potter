@@ -23,26 +23,29 @@ const App: React.FC = () => {
 
     // Load all data from local storage on initial render
     useEffect(() => {
-        try {
-            const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
-            const storedEntries = localStorage.getItem('journalEntries');
-            const storedTasks = localStorage.getItem('remembrallTasks');
-            const storedMoods = localStorage.getItem('potionMoods');
-
-            if (storedHouse) {
-                setHouse(storedHouse);
-                setView(View.Journal);
-            } else {
-                setView(View.Sorting);
-            }
-            if (storedEntries) setJournalEntries(JSON.parse(storedEntries));
-            if (storedTasks) setTasks(JSON.parse(storedTasks));
-            if (storedMoods) setMoods(JSON.parse(storedMoods));
-
-        } catch (error) {
-            console.error("Failed to load data from localStorage", error);
+        const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
+        if (storedHouse) {
+            setHouse(storedHouse);
+            setView(View.Journal);
+        } else {
+            setView(View.Sorting);
         }
+
+        try {
+            const storedEntries = localStorage.getItem('journalEntries');
+            if (storedEntries) setJournalEntries(JSON.parse(storedEntries));
+        } catch (e) { console.error("Could not parse journal entries", e); }
         
+        try {
+            const storedTasks = localStorage.getItem('remembrallTasks');
+            if (storedTasks) setTasks(JSON.parse(storedTasks));
+        } catch (e) { console.error("Could not parse remembrall tasks", e); }
+
+        try {
+            const storedMoods = localStorage.getItem('potionMoods');
+            if (storedMoods) setMoods(JSON.parse(storedMoods));
+        } catch (e) { console.error("Could not parse potion moods", e); }
+
         const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
         setFooterFact(WIZARDING_FACTS[randomIndex]);
         
@@ -51,18 +54,24 @@ const App: React.FC = () => {
 
     // Save journal entries when they change
     useEffect(() => {
-        localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
-    }, [journalEntries]);
+        if (!isLoading) {
+            localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
+        }
+    }, [journalEntries, isLoading]);
 
     // Save tasks when they change
     useEffect(() => {
-        localStorage.setItem('remembrallTasks', JSON.stringify(tasks));
-    }, [tasks]);
+        if (!isLoading) {
+            localStorage.setItem('remembrallTasks', JSON.stringify(tasks));
+        }
+    }, [tasks, isLoading]);
 
     // Save moods when they change
     useEffect(() => {
-        localStorage.setItem('potionMoods', JSON.stringify(moods));
-    }, [moods]);
+        if (!isLoading) {
+            localStorage.setItem('potionMoods', JSON.stringify(moods));
+        }
+    }, [moods, isLoading]);
 
     const theme = useMemo(() => {
         return house ? HOUSE_THEMES[house] : {
