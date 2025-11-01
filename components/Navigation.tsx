@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, HouseTheme, House } from '../types';
+import { ICONS } from '../constants';
 
 interface NavigationProps {
     currentView: View;
@@ -10,7 +11,7 @@ interface NavigationProps {
 
 const NavButton: React.FC<{
     label: string;
-    icon: string;
+    icon: string | React.ReactNode;
     view: View;
     currentView: View;
     setView: (view: View) => void;
@@ -37,11 +38,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, theme, ho
         { label: 'Remembrall', icon: '🔮', view: View.Remembrall },
         { label: 'Potions', icon: '🧪', view: View.Potions },
         { label: 'Decrees', icon: '📜', view: View.Decrees },
+        { label: 'Tests', icon: ICONS.TESTS, view: View.Test },
         { label: 'Settings', icon: '⚙️', view: View.Settings },
     ];
 
     return (
-        <nav className={`fixed bottom-0 left-0 right-0 h-20 shadow-top-lg flex justify-around items-center sm:max-w-4xl sm:mx-auto sm:rounded-b-lg ${theme.primary} ${theme.text}`}>
+        <nav className={`fixed bottom-0 left-0 right-0 h-20 shadow-top-lg grid grid-cols-6 justify-around items-center sm:max-w-4xl sm:mx-auto sm:rounded-b-lg ${theme.primary} ${theme.text}`}>
            {navItems.map(item => (
                 <NavButton
                     key={item.label}

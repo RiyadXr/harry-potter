@@ -9,6 +9,7 @@ import Settings from './components/Settings';
 import DailyDecrees from './components/DailyDecrees';
 import LoadingScreen from './components/LoadingScreen';
 import Modal from './components/Modal';
+import Test from './components/Test';
 import { House, View, JournalEntry, Task, Mood } from './types';
 import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
 import { getOwlAnswer } from './services/geminiService';
@@ -162,6 +163,7 @@ const App: React.FC = () => {
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} />;
             case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
+            case View.Test: return <Test theme={theme} userName={userName} house={house} />;
             default: return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} /> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };

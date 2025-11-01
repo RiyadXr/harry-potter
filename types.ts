@@ -12,6 +12,7 @@ export enum View {
     Decrees = 'Decrees',
     Settings = 'Settings',
     Sorting = 'Sorting',
+    Test = 'Test',
 }
 
 export interface JournalEntry {
@@ -58,4 +59,11 @@ export interface TriviaQuestion {
     question: string;
     options: string[];
     correctAnswer: string;
+}
+
+export interface Exam {
+    name: string;
+    description: string;
+    icon: string;
+    questions: TriviaQuestion[];
 }

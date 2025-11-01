@@ -58,7 +58,8 @@ export const ICONS = {
     EDIT: <>✏️</>,
     SPARKLES: <>✨</>,
     BROOM: <>🧹</>,
-    OWL: <>🦉</>
+    OWL: <>🦉</>,
+    TESTS: <>🎓</>,
 };
 
 export const SORTING_QUIZ_QUESTIONS = [
@@ -135,4 +136,35 @@ export const WIZARDING_TASKS_POOL: Omit<DailyTask, 'completed'>[] = [
     { id: '8', text: "Organize your potion ingredients", realTask: "Organize your desk or a drawer" },
     { id: '9', text: "Escape the Devil's Snare", realTask: "Untangle some headphones or cables" },
     { id: '10', text: "Defend against a Boggart", realTask: "Think of something you're grateful for" },
+];
+
+export const EXAM_TITLES: string[] = [
+    "O.W.L. Practice Paper",
+    "Ministry of Magic Competency Exam",
+    "Witchcraft & Wizardry Aptitude Test",
+    "Standard Book of Spells Quiz",
+    "Triwizard Tournament Trivia Challenge"
+];
+
+export const ALL_EXAM_QUESTIONS: TriviaQuestion[] = [
+    // DADA
+    { question: "What is the incantation for the Shield Charm?", options: ["Protego", "Expelliarmus", "Stupefy", "Expecto Patronum"], correctAnswer: "Protego" },
+    { question: "What does the Riddikulus charm do?", options: ["Repels Dementors", "Forces a Boggart to take a comical form", "Disarms an opponent", "Unlocks doors"], correctAnswer: "Forces a Boggart to take a comical form" },
+    { question: "Which of these is NOT a Dark Mark component?", options: ["A skull", "A serpent", "A lightning bolt", "A tongue protruding from the serpent's mouth"], correctAnswer: "A lightning bolt" },
+    { question: "What is the most effective way to repel a Dementor?", options: ["The Stunning Spell", "The Patronus Charm", "The Disarming Charm", "The Killing Curse"], correctAnswer: "The Patronus Charm" },
+    { question: "What creature pulls the Hogwarts carriages?", options: ["Hippogriffs", "Thestrals", "Unicorns", "Centaurs"], correctAnswer: "Thestrals" },
+    { question: "What is a known side effect of the Cruciatus Curse?", options: ["Instant death", "Intense, unbearable pain", "Total memory loss", "Loss of free will"], correctAnswer: "Intense, unbearable pain" },
+    // Potions
+    { question: "Which ingredient is NOT in the Polyjuice Potion?", options: ["Lacewing flies", "Leeches", "Fluxweed", "Mandrake root"], correctAnswer: "Mandrake root" },
+    { question: "What is the primary effect of Felix Felicis?", options: ["It induces love", "It forces the drinker to tell the truth", "It grants the drinker extreme luck", "It allows one to breathe underwater"], correctAnswer: "It grants the drinker extreme luck" },
+    { question: "What is a bezoar?", options: ["A stone from the stomach of a goat that protects from most poisons", "A magical plant used in sleeping draughts", "A type of magical egg", "A powerful truth serum"], correctAnswer: "A stone from the stomach of a goat that protects from most poisons" },
+    { question: "The Draught of Living Death puts the drinker into...", options: ["A deep, death-like sleep", "A fit of uncontrollable laughter", "A state of extreme anger", "A trance where they reveal secrets"], correctAnswer: "A deep, death-like sleep" },
+    { question: "What is the main ingredient in a Calming Draught?", options: ["Lavender", "Wormwood", "Asphodel", "Bezoar"], correctAnswer: "Lavender" },
+    // Charms
+    { question: "What is the incantation to summon an object?", options: ["Accio", "Alohomora", "Lumos", "Expelliarmus"], correctAnswer: "Accio" },
+    { question: "The Levitation Charm is 'Wingardium Leviosa'. What is the correct wand movement?", options: ["A sharp jab", "A swirl and a flick", "Swish and flick", "Point and hold"], correctAnswer: "Swish and flick" },
+    { question: "What does the spell 'Lumos' do?", options: ["Creates a loud bang", "Creates light at the wand tip", "Opens locked doors", "Repels water"], correctAnswer: "Creates light at the wand tip" },
+    { question: "Which charm would you use to repair a pair of broken glasses?", options: ["Reparo", "Reducio", "Engorgio", "Diffindo"], correctAnswer: "Reparo" },
+    { question: "What does the charm 'Alohomora' do?", options: ["Unlocks doors", "Summons objects", "Creates a shield", "Makes things float"], correctAnswer: "Unlocks doors" },
+    { question: "The Muffliato charm fills the ears of those nearby with what?", options: ["Unidentifiable buzzing", "Beautiful music", "Complete silence", "The caster's voice"], correctAnswer: "Unidentifiable buzzing" },
 ];
