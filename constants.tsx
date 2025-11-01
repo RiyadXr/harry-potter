@@ -57,7 +57,8 @@ export const ICONS = {
     QUILL: <span className="mr-2">✒️</span>,
     EDIT: <>✏️</>,
     SPARKLES: <>✨</>,
-    BROOM: <>🧹</>
+    BROOM: <>🧹</>,
+    OWL: <>🦉</>
 };
 
 export const SORTING_QUIZ_QUESTIONS = [

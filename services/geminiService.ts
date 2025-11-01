@@ -68,3 +68,26 @@ export const getSortingHatDecision = async (answers: string[], apiKey: string): 
         };
     }
 };
+
+export const getOwlAnswer = async (question: string, apiKey: string): Promise<string> => {
+     if (!apiKey) {
+        return "The owl seems unable to find its way. It needs the Headmaster's secret key to navigate the magical currents."
+    }
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const systemInstruction = `You are a wise, ancient owl delivering messages and knowledge from the heart of the wizarding world. Your name is Errol, and you've seen many things. A witch named Onamika has asked you a question. Answer her question based *only* on the lore from the Harry Potter books and movies. If the question is about the real world or anything outside of the Harry Potter universe, you must politely decline, stating that your vision is clouded for matters beyond the magical realm. Your tone should be wise, slightly archaic, and deeply thematic.`
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: question,
+            config: {
+                systemInstruction: systemInstruction,
+            }
+        });
+        return response.text;
+    } catch (error) {
+        console.error("Error fetching owl answer from Gemini:", error);
+        return "The owl returns with a ruffled feather, the message seemingly lost in a magical crosswind. Please try again.";
+    }
+};
