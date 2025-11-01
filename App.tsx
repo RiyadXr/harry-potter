@@ -170,12 +170,14 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen">
-            <button
+             <button
                 onClick={() => window.location.reload()}
                 aria-label="Force refresh page"
-                className="fixed top-4 right-4 z-50 p-2 bg-gray-700/50 backdrop-blur-sm rounded-full shadow-lg cursor-pointer text-2xl hover:bg-gray-700/70 transition-colors"
+                className={`fixed top-3 right-3 z-50 w-8 h-8 flex items-center justify-center ${theme.secondary} bg-opacity-70 backdrop-blur-sm rounded-full shadow-lg cursor-pointer hover:bg-opacity-90 transition-all`}
             >
-                🔄
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${theme.accent}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.182-3.182m0-11.667a8.25 8.25 0 00-11.667 0L2.985 7.982" />
+                </svg>
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
                 <Header house={house} theme={theme} />
