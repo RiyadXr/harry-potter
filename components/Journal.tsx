@@ -1,0 +1,73 @@
+import React, { useState } from 'react';
+import { JournalEntry, HouseTheme } from '../types';
+import { POTIONS, ICONS } from '../constants';
+
+interface JournalProps {
+    entries: JournalEntry[];
+    setEntries: React.Dispatch<React.SetStateAction<JournalEntry[]>>;
+    theme: HouseTheme;
+    userName: string;
+}
+
+const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName }) => {
+    const [newEntry, setNewEntry] = useState('');
+    const [mood, setMood] = useState(POTIONS[0].name);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newEntry.trim() === '') return;
+
+        const entry: JournalEntry = {
+            id: Date.now(),
+            date: new Date().toDateString(),
+            content: newEntry,
+            mood: mood,
+        };
+        setEntries([entry, ...entries]);
+        setNewEntry('');
+    };
+    
+    const inputBg = theme.primary.replace('bg-', 'bg-opacity-20 ');
+
+    return (
+        <div className={`${theme.text}`}>
+            <h2 className="text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}">Daily Prophet</h2>
+            <form onSubmit={handleSubmit} className="mb-6">
+                <textarea
+                    className={`w-full p-3 rounded-md bg-transparent border-2 ${theme.border} ${inputBg} focus:outline-none focus:ring-2 ${theme.border} transition-all`}
+                    rows={5}
+                    placeholder={`What mischief did you manage today, ${userName}?`}
+                    value={newEntry}
+                    onChange={(e) => setNewEntry(e.target.value)}
+                />
+                <div className="flex justify-between items-center mt-4">
+                     <select 
+                        value={mood}
+                        onChange={e => setMood(e.target.value)}
+                        className={`p-2 rounded-md bg-transparent border-2 ${theme.border} ${inputBg} focus:outline-none focus:ring-2 ${theme.border}`}>
+                         {POTIONS.map(p => <option key={p.name} value={p.name} className={`${theme.secondary} ${theme.text}`}>{p.name}</option>)}
+                     </select>
+                    <button type="submit" className={`flex items-center px-4 py-2 ${theme.primary} rounded-lg shadow-md hover:scale-105 transition-transform`}>
+                        {ICONS.QUILL}
+                        Scribe
+                    </button>
+                </div>
+            </form>
+
+            <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                {entries.length === 0 ? (
+                    <p className="text-center opacity-70">Your scroll is empty. Write your first entry!</p>
+                ) : (
+                    entries.map(entry => (
+                        <div key={entry.id} className={`p-4 border-l-4 ${theme.border} rounded-r-lg ${inputBg}`}>
+                            <p className="text-sm ${theme.accent} font-magic">{entry.date} - Mood: {entry.mood}</p>
+                            <p className="mt-2 whitespace-pre-wrap">{entry.content}</p>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Journal;
