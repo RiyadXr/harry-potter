@@ -21,23 +21,36 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
         const storedTasks = localStorage.getItem(storageKey);
 
         if (storedTasks) {
-            setTasks(JSON.parse(storedTasks));
+            try {
+                const parsedTasks = JSON.parse(storedTasks);
+                 if (Array.isArray(parsedTasks)) {
+                    setTasks(parsedTasks);
+                 } else {
+                    throw new Error("Stored tasks are not an array");
+                 }
+            } catch {
+                generateNewTasks(storageKey);
+            }
         } else {
-            // New day, shuffle and pick 5 new random tasks
-            const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
-            const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
-
-            setTasks(newTasks);
-            localStorage.setItem(storageKey, JSON.stringify(newTasks));
-            
-            // Clean up old decree keys to prevent localStorage bloat
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('decrees-') && key !== storageKey) {
-                    localStorage.removeItem(key);
-                }
-            });
+            generateNewTasks(storageKey);
         }
     }, []);
+
+    const generateNewTasks = (storageKey: string) => {
+        // New day, shuffle and pick 5 new random tasks
+        const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
+        const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
+
+        setTasks(newTasks);
+        localStorage.setItem(storageKey, JSON.stringify(newTasks));
+        
+        // Clean up old decree keys to prevent localStorage bloat
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('decrees-') && key !== storageKey) {
+                localStorage.removeItem(key);
+            }
+        });
+    };
 
     const toggleTask = (id: string) => {
         const newTasks = tasks.map(task => 
@@ -58,21 +71,29 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
             
             <div className="space-y-4">
                 {tasks.map(task => (
-                    <div 
+                    <label 
                         key={task.id}
-                        onClick={() => toggleTask(task.id)}
                         className={`p-4 rounded-lg flex items-center cursor-pointer transition-all duration-300 border-2 ${theme.border} ${task.completed ? `bg-green-800/30` : `bg-black/10`}`}
                     >
                         <input
                             type="checkbox"
-                            readOnly
                             checked={task.completed}
-                            className="form-checkbox h-6 w-6 rounded-full bg-transparent border-2 border-current text-yellow-400 focus:ring-0 focus:ring-offset-0 flex-shrink-0"
+                            onChange={() => toggleTask(task.id)}
+                            className="sr-only" // Visually hide the real checkbox but keep it functional
                         />
+                         {/* Custom checkbox visual */}
+                        <div className="relative h-6 w-6 flex-shrink-0">
+                            <div className={`h-6 w-6 rounded-md bg-transparent border-2 ${theme.border}`}></div>
+                            {task.completed && (
+                                <span className={`absolute inset-0 flex items-center justify-center text-2xl ${theme.accent}`}>
+                                    ✓
+                                </span>
+                            )}
+                        </div>
                         <span className={`ml-4 text-lg ${task.completed ? 'line-through opacity-70' : ''}`}>
                             {task.text} <span className="text-sm opacity-80">({task.realTask})</span>
                         </span>
-                    </div>
+                    </label>
                 ))}
             </div>
 

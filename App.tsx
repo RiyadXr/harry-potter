@@ -8,8 +8,9 @@ import SortingHat from './components/SortingHat';
 import Settings from './components/Settings';
 import DailyDecrees from './components/DailyDecrees';
 import LoadingScreen from './components/LoadingScreen';
+import Modal from './components/Modal';
 import { House, View, JournalEntry, Task, Mood } from './types';
-import { HOUSE_THEMES, WIZARDING_FACTS } from './constants';
+import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
 
 const App: React.FC = () => {
     const [view, setView] = useState<View>(View.Journal);
@@ -19,37 +20,61 @@ const App: React.FC = () => {
     const [moods, setMoods] = useState<Mood[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [footerFact, setFooterFact] = useState('');
+    const [isBroomVisible, setIsBroomVisible] = useState(false);
+    const [showFactModal, setShowFactModal] = useState(false);
+    const [currentFact, setCurrentFact] = useState('');
     const userName = "Onamika";
 
     // Load all data from local storage on initial render
     useEffect(() => {
-        const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
-        if (storedHouse) {
-            setHouse(storedHouse);
-            setView(View.Journal);
-        } else {
-            setView(View.Sorting);
-        }
-
         try {
+            // --- House Data Validation ---
+            const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
+            if (storedHouse && Object.values(House).includes(storedHouse)) {
+                setHouse(storedHouse);
+                setView(View.Journal);
+            } else {
+                setView(View.Sorting);
+            }
+
+            // --- Journal Entries Validation ---
             const storedEntries = localStorage.getItem('journalEntries');
-            if (storedEntries) setJournalEntries(JSON.parse(storedEntries));
-        } catch (e) { console.error("Could not parse journal entries", e); }
-        
-        try {
+            if (storedEntries) {
+                const parsedEntries = JSON.parse(storedEntries);
+                if (Array.isArray(parsedEntries)) {
+                    setJournalEntries(parsedEntries);
+                }
+            }
+            
+            // --- Tasks Validation ---
             const storedTasks = localStorage.getItem('remembrallTasks');
-            if (storedTasks) setTasks(JSON.parse(storedTasks));
-        } catch (e) { console.error("Could not parse remembrall tasks", e); }
+            if (storedTasks) {
+                const parsedTasks = JSON.parse(storedTasks);
+                if (Array.isArray(parsedTasks)) {
+                    setTasks(parsedTasks);
+                }
+            }
 
-        try {
+            // --- Moods Validation ---
             const storedMoods = localStorage.getItem('potionMoods');
-            if (storedMoods) setMoods(JSON.parse(storedMoods));
-        } catch (e) { console.error("Could not parse potion moods", e); }
-
-        const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
-        setFooterFact(WIZARDING_FACTS[randomIndex]);
-        
-        setIsLoading(false);
+            if (storedMoods) {
+                const parsedMoods = JSON.parse(storedMoods);
+                if(Array.isArray(parsedMoods)) {
+                    setMoods(parsedMoods);
+                }
+            }
+        } catch (e) {
+            console.error("Error hydrating app from localStorage. Resetting state.", e);
+            // If any critical error happens during hydration, reset to a clean slate.
+            localStorage.clear();
+            setHouse(null);
+            setView(View.Sorting);
+        } finally {
+            // This will always run, ensuring the app becomes interactive.
+            const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
+            setFooterFact(WIZARDING_FACTS[randomIndex]);
+            setIsLoading(false);
+        }
     }, []);
 
     // Save journal entries when they change
@@ -72,6 +97,36 @@ const App: React.FC = () => {
             localStorage.setItem('potionMoods', JSON.stringify(moods));
         }
     }, [moods, isLoading]);
+    
+    // useEffect for the floating broom
+    useEffect(() => {
+        let intervalId: ReturnType<typeof setTimeout>;
+        let timeoutId: ReturnType<typeof setTimeout>;
+
+        const showBroom = () => {
+            if (view !== View.Sorting && !showFactModal) {
+                setIsBroomVisible(true);
+                timeoutId = setTimeout(() => {
+                    setIsBroomVisible(false);
+                }, 15000); // Broom disappears after 15 seconds
+            }
+        };
+
+        const setRandomInterval = () => {
+            const randomDelay = Math.random() * 30000 + 30000; // 30s to 60s
+            intervalId = setTimeout(() => {
+                showBroom();
+                setRandomInterval();
+            }, randomDelay);
+        };
+        
+        setRandomInterval();
+
+        return () => {
+            clearTimeout(intervalId);
+            clearTimeout(timeoutId);
+        };
+    }, [view, showFactModal]);
 
     const theme = useMemo(() => {
         return house ? HOUSE_THEMES[house] : {
@@ -97,6 +152,19 @@ const App: React.FC = () => {
         setView(View.Sorting);
     };
     
+     const handleBroomClick = () => {
+        const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
+        setCurrentFact(WIZARDING_FACTS[randomIndex]);
+        setShowFactModal(true);
+        setIsBroomVisible(false);
+    };
+    
+    const handleSetView = (newView: View) => {
+        setView(newView);
+        const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
+        setFooterFact(WIZARDING_FACTS[randomIndex]);
+    };
+
     if(isLoading) {
         return <LoadingScreen userName={userName} />;
     }
@@ -116,7 +184,6 @@ const App: React.FC = () => {
             case View.Sorting:
                 return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             default:
-                 // Fallback to sorting if no house is set, otherwise to journal
                 return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} /> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };
@@ -132,8 +199,30 @@ const App: React.FC = () => {
                     <p>"{footerFact}"</p>
                 </footer>
             </div>
+            
+            {isBroomVisible && (
+                <button
+                    onClick={handleBroomClick}
+                    aria-label="Get a wizarding world fact"
+                    className="fixed bottom-24 right-4 sm:right-8 z-40 p-3 bg-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-transform"
+                >
+                    <span className="text-3xl">{ICONS.BROOM}</span>
+                </button>
+            )}
+            
+            {showFactModal && (
+                <Modal
+                    title="Did you know?"
+                    onClose={() => setShowFactModal(false)}
+                    theme={theme}
+                    footerButtonText="Brilliant!"
+                >
+                    <p className="text-lg text-center">{currentFact}</p>
+                </Modal>
+            )}
+
             {view !== View.Sorting && (
-                <Navigation currentView={view} setView={setView} theme={theme} house={house} />
+                <Navigation currentView={view} setView={handleSetView} theme={theme} house={house} />
             )}
         </div>
     );

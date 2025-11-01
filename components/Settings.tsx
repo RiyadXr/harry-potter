@@ -82,7 +82,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                                         value={option}
                                         checked={selectedAnswer === option}
                                         onChange={() => setSelectedAnswer(option)}
-                                        className="form-radio h-5 w-5 bg-transparent border-2 border-current text-yellow-400 focus:ring-yellow-400"
+                                        className="appearance-none h-5 w-5 rounded-full border-2 border-current checked:bg-yellow-400 checked:border-yellow-600 focus:outline-none transition-colors"
                                     />
                                     <span className="ml-3">{option}</span>
                                 </label>

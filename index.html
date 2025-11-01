@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfect Potter Journal</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,6 +36,24 @@
       }
       .animate-fade-in-up {
         animation: fade-in-up 0.5s ease-out forwards;
+      }
+      @keyframes float-up-down {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      .animate-float {
+        animation: float-up-down 3s ease-in-out infinite;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
       }
     </style>
   <script type="importmap">

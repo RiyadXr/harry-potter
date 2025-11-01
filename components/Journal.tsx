@@ -84,7 +84,12 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName 
                            <div className="flex justify-between items-start">
                                 <p className="text-sm ${theme.accent} font-magic">{entry.date} - Mood: {entry.mood}</p>
                                 {editingId !== entry.id && (
-                                     <button onClick={() => handleStartEdit(entry)} disabled={isEditing} className={`p-1 rounded-full ${isEditing ? 'opacity-50' : `hover:${theme.primary}`}`}>
+                                     <button 
+                                        onClick={() => handleStartEdit(entry)} 
+                                        disabled={isEditing} 
+                                        className={`p-1 rounded-full ${isEditing ? 'opacity-50' : `hover:${theme.primary}`}`}
+                                        aria-label="Edit entry"
+                                     >
                                         {ICONS.EDIT}
                                     </button>
                                 )}

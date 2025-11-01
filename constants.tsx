@@ -56,7 +56,8 @@ export const POTIONS: { name: string, color: string }[] = [
 export const ICONS = {
     QUILL: <span className="mr-2">✒️</span>,
     EDIT: <>✏️</>,
-    SPARKLES: <>✨</>
+    SPARKLES: <>✨</>,
+    BROOM: <>🧹</>
 };
 
 export const SORTING_QUIZ_QUESTIONS = [
