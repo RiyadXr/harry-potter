@@ -12,7 +12,7 @@ import { House, View, JournalEntry, Task, Mood } from './types';
 import { HOUSE_THEMES, WIZARDING_FACTS } from './constants';
 
 const App: React.FC = () => {
-    const [view, setView] = useState<View>(View.Sorting);
+    const [view, setView] = useState<View>(View.Journal);
     const [house, setHouse] = useState<House | null>(null);
     const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -21,16 +21,48 @@ const App: React.FC = () => {
     const [footerFact, setFooterFact] = useState('');
     const userName = "Onamika";
 
+    // Load all data from local storage on initial render
     useEffect(() => {
-        // Simulate loading time for the intro screen
-        const timer = setTimeout(() => setIsLoading(false), 3000);
+        try {
+            const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
+            const storedEntries = localStorage.getItem('journalEntries');
+            const storedTasks = localStorage.getItem('remembrallTasks');
+            const storedMoods = localStorage.getItem('potionMoods');
+
+            if (storedHouse) {
+                setHouse(storedHouse);
+                setView(View.Journal);
+            } else {
+                setView(View.Sorting);
+            }
+            if (storedEntries) setJournalEntries(JSON.parse(storedEntries));
+            if (storedTasks) setTasks(JSON.parse(storedTasks));
+            if (storedMoods) setMoods(JSON.parse(storedMoods));
+
+        } catch (error) {
+            console.error("Failed to load data from localStorage", error);
+        }
         
-        // Pick a random fact for the footer
         const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
         setFooterFact(WIZARDING_FACTS[randomIndex]);
-
-        return () => clearTimeout(timer);
+        
+        setIsLoading(false);
     }, []);
+
+    // Save journal entries when they change
+    useEffect(() => {
+        localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
+    }, [journalEntries]);
+
+    // Save tasks when they change
+    useEffect(() => {
+        localStorage.setItem('remembrallTasks', JSON.stringify(tasks));
+    }, [tasks]);
+
+    // Save moods when they change
+    useEffect(() => {
+        localStorage.setItem('potionMoods', JSON.stringify(moods));
+    }, [moods]);
 
     const theme = useMemo(() => {
         return house ? HOUSE_THEMES[house] : {
@@ -44,6 +76,7 @@ const App: React.FC = () => {
     
     const handleSort = (result: { house: House, reasoning: string }) => {
         setHouse(result.house);
+        localStorage.setItem('hogwartsHouse', result.house);
         localStorage.setItem('lastSortTimestamp', new Date().getTime().toString());
         setView(View.Journal);
     };
@@ -51,6 +84,7 @@ const App: React.FC = () => {
     const handleLeaveHouse = () => {
         if (window.confirm(`Are you sure you wish to leave ${house}? The common room will miss you!`)) {
             setHouse(null);
+            localStorage.removeItem('hogwartsHouse');
             localStorage.removeItem('lastSortTimestamp'); 
             setView(View.Sorting);
         }
@@ -69,13 +103,14 @@ const App: React.FC = () => {
             case View.Potions:
                 return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} />;
             case View.Decrees:
-                return <DailyDecrees theme={theme} userName={userName} />;
+                return <DailyDecrees theme={theme} userName={userName} house={house} />;
             case View.Settings:
                 return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} />;
             case View.Sorting:
                 return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             default:
-                return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
+                 // Fallback to sorting if no house is set, otherwise to journal
+                return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} /> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };
 

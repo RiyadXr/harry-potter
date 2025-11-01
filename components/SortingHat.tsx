@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HouseTheme, SortingResult } from '../types';
 import { SORTING_QUIZ_QUESTIONS, ICONS } from '../constants';
 import { getSortingHatDecision } from '../services/geminiService';
@@ -15,12 +15,23 @@ const SortingHat: React.FC<SortingHatProps> = ({ onSort, theme, userName }) => {
     const [answers, setAnswers] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<SortingResult | null>(null);
+    const [shuffledQuestions, setShuffledQuestions] = useState<(typeof SORTING_QUIZ_QUESTIONS)>([]);
+
+    useEffect(() => {
+        // Fisher-Yates shuffle algorithm to randomize questions
+        const shuffled = [...SORTING_QUIZ_QUESTIONS];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setShuffledQuestions(shuffled);
+    }, []);
 
     const handleAnswer = async (value: string) => {
         const newAnswers = [...answers, value];
         setAnswers(newAnswers);
 
-        if (currentQuestion < SORTING_QUIZ_QUESTIONS.length - 1) {
+        if (currentQuestion < shuffledQuestions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
         } else {
             setIsLoading(true);
@@ -53,7 +64,15 @@ const SortingHat: React.FC<SortingHatProps> = ({ onSort, theme, userName }) => {
         )
     }
 
-    const question = SORTING_QUIZ_QUESTIONS[currentQuestion];
+    if (shuffledQuestions.length === 0) {
+        return (
+            <div className="text-center p-8">
+                <p className={`${theme.text}`}>The Sorting Hat is clearing its throat...</p>
+            </div>
+        );
+    }
+
+    const question = shuffledQuestions[currentQuestion];
 
     return (
         <div className={`p-2 sm:p-4 text-center ${theme.text}`}>

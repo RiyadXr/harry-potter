@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { HouseTheme, DailyTask } from '../types';
-import { DAILY_TASKS } from '../constants';
+import { HouseTheme, DailyTask, House } from '../types';
+import { WIZARDING_TASKS_POOL } from '../constants';
 
 interface DailyDecreesProps {
     theme: HouseTheme;
     userName: string;
+    house: House | null;
 }
 
 const getTodayStorageKey = () => {
@@ -12,7 +13,7 @@ const getTodayStorageKey = () => {
     return `decrees-${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
 }
 
-const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName }) => {
+const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) => {
     const [tasks, setTasks] = useState<DailyTask[]>([]);
 
     useEffect(() => {
@@ -22,8 +23,10 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName }) => {
         if (storedTasks) {
             setTasks(JSON.parse(storedTasks));
         } else {
-            // New day, new tasks
-            const newTasks = DAILY_TASKS.map(task => ({ ...task, completed: false }));
+            // New day, shuffle and pick 5 new random tasks
+            const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
+            const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
+
             setTasks(newTasks);
             localStorage.setItem(storageKey, JSON.stringify(newTasks));
             
@@ -64,10 +67,10 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName }) => {
                             type="checkbox"
                             readOnly
                             checked={task.completed}
-                            className="form-checkbox h-6 w-6 rounded-full bg-transparent border-2 border-current text-yellow-400 focus:ring-0 focus:ring-offset-0"
+                            className="form-checkbox h-6 w-6 rounded-full bg-transparent border-2 border-current text-yellow-400 focus:ring-0 focus:ring-offset-0 flex-shrink-0"
                         />
                         <span className={`ml-4 text-lg ${task.completed ? 'line-through opacity-70' : ''}`}>
-                            {task.text}
+                            {task.text} <span className="text-sm opacity-80">({task.realTask})</span>
                         </span>
                     </div>
                 ))}
@@ -75,7 +78,7 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName }) => {
 
             {allTasksCompleted && (
                  <div className="mt-8 text-center p-4 rounded-lg bg-yellow-500/20 animate-fade-in-up">
-                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! Ten points to {localStorage.getItem('hogwartsHouse') || 'your House'}!</p>
+                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! Ten points to {house || 'your House'}!</p>
                  </div>
             )}
         </div>
