@@ -1,5 +1,5 @@
 import React from 'react';
-import { House, HouseTheme } from './types';
+import { House, HouseTheme, TriviaQuestion } from './types';
 
 export const HOUSE_THEMES: Record<House, HouseTheme> = {
     [House.Gryffindor]: {
@@ -117,4 +117,32 @@ export const WIZARDING_TASKS_POOL = [
     { id: 'task_13', text: 'Use a Mending Charm', realTask: 'fix something small that is broken' },
     { id: 'task_14', text: 'Study Herbology', realTask: 'spend 5 minutes in nature' },
     { id: 'task_15', text: 'Escape the Dursleys\'', realTask: 'go for a short walk outside' },
+];
+
+export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
+    {
+        question: "What is the name of Hagrid's pet Acromantula?",
+        options: ["Norbert", "Aragog", "Buckbeak", "Fang"],
+        correctAnswer: "Aragog"
+    },
+    {
+        question: "Which of these is NOT one of the Unforgivable Curses?",
+        options: ["Cruciatus Curse", "Imperius Curse", "Sectumsempra", "Avada Kedavra"],
+        correctAnswer: "Sectumsempra"
+    },
+    {
+        question: "What does the charm 'Wingardium Leviosa' do?",
+        options: ["Unlocks doors", "Summons objects", "Makes objects fly", "Creates light"],
+        correctAnswer: "Makes objects fly"
+    },
+    {
+        question: "Who is the Half-Blood Prince?",
+        options: ["Harry Potter", "Tom Riddle", "Severus Snape", "Albus Dumbledore"],
+        correctAnswer: "Severus Snape"
+    },
+    {
+        question: "What position does Harry Potter play in Quidditch?",
+        options: ["Seeker", "Chaser", "Beater", "Keeper"],
+        correctAnswer: "Seeker"
+    }
 ];

@@ -7,9 +7,10 @@ interface ModalProps {
     onClose: () => void;
     theme: HouseTheme;
     children: React.ReactNode;
+    showFooterButton?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ title, onClose, theme, children }) => {
+const Modal: React.FC<ModalProps> = ({ title, onClose, theme, children, showFooterButton = true }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
             <div className={`relative p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md border-4 ${theme.border} ${theme.secondary} ${theme.text}`}>
@@ -17,14 +18,16 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, theme, children }) => {
                 <div className="mb-6">
                     {children}
                 </div>
-                <div className="text-center">
-                    <button
-                        onClick={onClose}
-                        className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
-                    >
-                        Continue to the Great Hall
-                    </button>
-                </div>
+                {showFooterButton && (
+                    <div className="text-center">
+                        <button
+                            onClick={onClose}
+                            className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
+                        >
+                            Continue to the Great Hall
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

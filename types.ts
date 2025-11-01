@@ -53,3 +53,9 @@ export interface DailyTask {
     realTask: string;
     completed: boolean;
 }
+
+export interface TriviaQuestion {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+}

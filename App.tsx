@@ -82,12 +82,10 @@ const App: React.FC = () => {
     };
 
     const handleLeaveHouse = () => {
-        if (window.confirm(`Are you sure you wish to leave ${house}? The common room will miss you!`)) {
-            setHouse(null);
-            localStorage.removeItem('hogwartsHouse');
-            localStorage.removeItem('lastSortTimestamp'); 
-            setView(View.Sorting);
-        }
+        setHouse(null);
+        localStorage.removeItem('hogwartsHouse');
+        localStorage.removeItem('lastSortTimestamp'); 
+        setView(View.Sorting);
     };
     
     if(isLoading) {
