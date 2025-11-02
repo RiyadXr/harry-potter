@@ -10,7 +10,8 @@ import DailyDecrees from './components/DailyDecrees';
 import LoadingScreen from './components/LoadingScreen';
 import Modal from './components/Modal';
 import Test from './components/Test';
-import { House, View, JournalEntry, Task, Mood } from './types';
+import Shop from './components/Shop';
+import { House, View, JournalEntry, Task, Mood, ShopItem } from './types';
 import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
 import { getOwlAnswer } from './services/geminiService';
 
@@ -21,6 +22,7 @@ const App: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [moods, setMoods] = useState<Mood[]>([]);
     const [rewards, setRewards] = useState<number>(0);
+    const [purchasedItems, setPurchasedItems] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [footerFact, setFooterFact] = useState('');
     
@@ -67,6 +69,17 @@ const App: React.FC = () => {
                 const parsedRewards = parseInt(storedRewards, 10);
                 if (!isNaN(parsedRewards)) setRewards(parsedRewards);
             }
+            const storedPurchasedItems = localStorage.getItem('potterJournalPurchases');
+            if (storedPurchasedItems) {
+                const parsedItems = JSON.parse(storedPurchasedItems);
+                // Gracefully handle migration from old string[] format to new Record<string, number> format
+                if (Array.isArray(parsedItems)) {
+                    const newItems = parsedItems.reduce((acc, id) => ({ ...acc, [id]: 1 }), {});
+                    setPurchasedItems(newItems);
+                } else if (typeof parsedItems === 'object' && parsedItems !== null) {
+                    setPurchasedItems(parsedItems);
+                }
+            }
         } catch (e) {
             console.error("Error hydrating app from localStorage. Resetting state.", e);
             localStorage.clear();
@@ -84,6 +97,7 @@ const App: React.FC = () => {
     useEffect(() => { if (!isLoading) localStorage.setItem('remembrallTasks', JSON.stringify(tasks)); }, [tasks, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('potionMoods', JSON.stringify(moods)); }, [moods, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('potterJournalRewards', rewards.toString()); }, [rewards, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('potterJournalPurchases', JSON.stringify(purchasedItems)); }, [purchasedItems, isLoading]);
     
     // Floating broom effect
     useEffect(() => {
@@ -162,6 +176,16 @@ const App: React.FC = () => {
         setRewards(prev => prev + amount);
     };
 
+    const handlePurchaseItem = (item: ShopItem) => {
+        if (rewards >= item.price) {
+            setRewards(prev => prev - item.price);
+            setPurchasedItems(prev => ({
+                ...prev,
+                [item.id]: (prev[item.id] || 0) + 1
+            }));
+        }
+    };
+
     if(isLoading) {
         return <LoadingScreen userName={userName} />;
     }
@@ -172,9 +196,10 @@ const App: React.FC = () => {
             case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} addRewards={addRewards} />;
             case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} addRewards={addRewards} />;
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} />;
-            case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} />;
+            case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             case View.Test: return <Test theme={theme} userName={userName} house={house} addRewards={addRewards} />;
+            case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} />;
             default: return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards}/> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };
@@ -191,7 +216,7 @@ const App: React.FC = () => {
                 </svg>
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
-                <Header house={house} theme={theme} rewards={rewards} />
+                <Header house={house} theme={theme} rewards={rewards} setView={handleSetView} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
                     <div key={view} className="animate-fade-in">
                         {renderView()}

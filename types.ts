@@ -13,6 +13,7 @@ export enum View {
     Settings = 'Settings',
     Sorting = 'Sorting',
     Test = 'Test',
+    Shop = 'Shop',
 }
 
 export interface JournalEntry {
@@ -71,4 +72,12 @@ export interface Exam {
 export interface DailyProphetArticle {
     headline: string;
     article: string;
+}
+
+export interface ShopItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    icon: string;
 }

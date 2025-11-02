@@ -1,7 +1,5 @@
-
-
 import React from 'react';
-import { House, HouseTheme, TriviaQuestion, DailyTask } from './types';
+import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem } from './types';
 
 export const HOUSE_THEMES: Record<House, HouseTheme> = {
     [House.Gryffindor]: {
@@ -171,4 +169,22 @@ export const ALL_EXAM_QUESTIONS: TriviaQuestion[] = [
     { question: "Which charm would you use to repair a pair of broken glasses?", options: ["Reparo", "Reducio", "Engorgio", "Diffindo"], correctAnswer: "Reparo" },
     { question: "What does the charm 'Alohomora' do?", options: ["Unlocks doors", "Summons objects", "Creates a shield", "Makes things float"], correctAnswer: "Unlocks doors" },
     { question: "The Muffliato charm fills the ears of those nearby with what?", options: ["Unidentifiable buzzing", "Beautiful music", "Complete silence", "The caster's voice"], correctAnswer: "Unidentifiable buzzing" },
+];
+
+export const SHOP_ITEMS: ShopItem[] = [
+    { id: 'beans', name: "Bertie Bott's Beans", description: "A risky treat. Will you get toffee or earwax?", price: 15, icon: '🍬' },
+    { id: 'frog', name: "Chocolate Frog", description: "Comes with a collectible card of a famous witch or wizard!", price: 20, icon: '🐸' },
+    { id: 'ticket', name: "Hogwarts Express Ticket", description: "A one-way trip on the famed scarlet steam engine.", price: 50, icon: '🎟️' },
+    { id: 'scarf', name: "House Scarf", description: "Show your house pride, no matter the weather.", price: 60, icon: '🧣' },
+    { id: 'map', name: "Marauder's Map", description: "I solemnly swear that I am up to no good.", price: 75, icon: '🗺️' },
+    { id: 'snitch', name: "Golden Snitch", description: "The most important ball of the lot. Worth 150 points.", price: 100, icon: '✨' },
+    { id: 'remembrall', name: "Remembrall", description: "The smoke turns red when you've forgotten something.", price: 120, icon: '🔮' },
+    { id: 'howler', name: "Howler", description: "Deliver a message with... emphasis. Best opened in private.", price: 180, icon: '🧧' },
+    { id: 'timeturner', name: "Time Turner", description: "Use with caution. Three turns should do it.", price: 250, icon: '⏳' },
+    { id: 'potionbook', name: "Advanced Potion-Making", description: "Property of the Half-Blood Prince.", price: 300, icon: '📖' },
+    { id: 'cloak', name: "Invisibility Cloak", description: "A true heirloom, passed down through generations.", price: 500, icon: '👻' },
+    { id: 'nimbus', name: "Nimbus 2000", description: "State-of-the-art racing broom. Outstrips the Cleansweep series.", price: 750, icon: '🧹' },
+    { id: 'stone', name: "Philosopher's Stone", description: "An alchemical marvel that grants eternal life.", price: 1500, icon: '💎' },
+    { id: 'sword', name: "Sword of Gryffindor", description: "Only a true Gryffindor could have pulled that out of the hat.", price: 2000, icon: '⚔️' },
+    { id: 'elderwand', name: "The Elder Wand", description: "The most powerful wand ever made. The Wand of Destiny.", price: 5000, icon: '🪄' },
 ];

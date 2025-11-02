@@ -1,14 +1,15 @@
-
 import React, { useState, useMemo } from 'react';
-import { HouseTheme, House, View } from '../types';
-import { TRIVIA_QUESTIONS, ICONS } from '../constants';
+import { HouseTheme, House, View, ShopItem } from '../types';
+import { TRIVIA_QUESTIONS, ICONS, SHOP_ITEMS } from '../constants';
 import Modal from './Modal';
+import { getAnimationForItem } from '../utils/animations';
 
 interface SettingsProps {
     theme: HouseTheme;
     house: House | null;
     setView: (view: View) => void;
     onLeaveHouse: () => void;
+    purchasedItems: Record<string, number>;
 }
 
 const Sparkles: React.FC = () => {
@@ -37,15 +38,33 @@ const Sparkles: React.FC = () => {
 };
 
 
-const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
+const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchasedItems }) => {
     const [isTriviaModalOpen, setIsTriviaModalOpen] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState('');
     const [isLetterOpen, setIsLetterOpen] = useState(false);
+    const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
 
     const currentQuestion = useMemo(() => {
         return TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)];
     }, [isTriviaModalOpen]);
+    
+    const userTrophies = useMemo(() => {
+        return SHOP_ITEMS.filter(item => (purchasedItems[item.id] || 0) > 0);
+    }, [purchasedItems]);
+
+    const handleTrophyClick = (item: ShopItem) => {
+        if (animatingItemId) return; // Prevent re-triggering animation
+        setAnimatingItemId(item.id);
+        setTimeout(() => setAnimatingItemId(null), 2000); // Animation duration
+    };
+
+    const getTrophyStyle = (count: number): string => {
+        if (count >= 10) return 'shadow-[0_0_15px_3px_rgba(255,215,0,0.8)] animate-magical-glow'; // Legendary
+        if (count >= 5) return 'shadow-[0_0_12px_2px_rgba(192,192,192,0.7)]'; // Precious
+        if (count >= 2) return 'shadow-[0_0_8px_1px_rgba(255,255,255,0.5)]'; // Valuable
+        return '';
+    };
 
     const handleStartTrivia = () => {
         if (!house) return;
@@ -73,6 +92,13 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
 
     return (
         <div className={`${theme.text}`}>
+             {animatingItemId && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 pointer-events-none">
+                    <div className={`text-8xl ${getAnimationForItem(animatingItemId)}`}>
+                        {SHOP_ITEMS.find(i => i.id === animatingItemId)?.icon}
+                    </div>
+                </div>
+            )}
             <h2 className={`text-3xl font-magic mb-6 border-b-2 pb-2 ${theme.border}`}>Room of Requirement</h2>
             
             <div className="space-y-4">
@@ -89,8 +115,35 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                 </div>
 
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
-                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Your House</h3>
-                    <p>You are currently a proud member of {house ? <strong>{house}</strong> : 'no house yet'}.</p>
+                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Trophy Room</h3>
+                    {userTrophies.length === 0 ? (
+                        <p className="opacity-75">Your collection is empty. Visit the Diagon Alley Emporium by tapping your Galleons in the header!</p>
+                    ) : (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                            {userTrophies.map(trophy => {
+                                const count = purchasedItems[trophy.id] || 0;
+                                const trophyStyle = getTrophyStyle(count);
+
+                                return (
+                                <button 
+                                    key={trophy.id} 
+                                    onClick={() => handleTrophyClick(trophy)}
+                                    className="flex flex-col items-center text-center group transform hover:scale-110 transition-transform duration-300" 
+                                    title={`${trophy.name} (x${count}): ${trophy.description}`}
+                                >
+                                    <div className={`relative w-16 h-16 rounded-lg ${theme.primary} flex items-center justify-center text-4xl group-hover:shadow-lg transition-all duration-300 ${trophyStyle}`}>
+                                        {trophy.icon}
+                                        {count > 1 && (
+                                            <span className={`absolute -top-2 -right-2 bg-yellow-500 text-black font-sans text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center border-2 ${theme.border}`}>
+                                                {count}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs mt-1 font-magic">{trophy.name}</p>
+                                </button>
+                            )})}
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
