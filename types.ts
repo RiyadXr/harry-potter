@@ -1,3 +1,4 @@
+// FIX: Removed a self-import of 'House' that was causing a conflict with its own declaration.
 export enum House {
     Gryffindor = 'Gryffindor',
     Slytherin = 'Slytherin',
@@ -10,7 +11,7 @@ export enum View {
     Remembrall = 'Remembrall',
     Potions = 'Potions',
     Decrees = 'Decrees',
-    Settings = 'Settings',
+    Requirement = 'Requirement',
     Sorting = 'Sorting',
     Test = 'Test',
     Shop = 'Shop',

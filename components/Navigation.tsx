@@ -39,7 +39,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, theme, ho
         { label: 'Potions', icon: '🧪', view: View.Potions },
         { label: 'Decrees', icon: '📜', view: View.Decrees },
         { label: 'Tests', icon: ICONS.TESTS, view: View.Test },
-        { label: 'Settings', icon: '⚙️', view: View.Settings },
+        { label: 'The Room', icon: '🗝️', view: View.Requirement },
     ];
 
     return (

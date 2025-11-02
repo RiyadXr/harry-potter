@@ -196,7 +196,7 @@ const App: React.FC = () => {
             case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} addRewards={addRewards} />;
             case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} addRewards={addRewards} />;
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} />;
-            case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} />;
+            case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             case View.Test: return <Test theme={theme} userName={userName} house={house} addRewards={addRewards} />;
             case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} />;
