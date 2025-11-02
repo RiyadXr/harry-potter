@@ -82,3 +82,13 @@ export interface ShopItem {
     price: number;
     icon: string;
 }
+
+export interface HouseInfo {
+    founder: string;
+    animal: string;
+    colors: string;
+    element: string;
+    trait: string;
+    description: string;
+    students: string[];
+}

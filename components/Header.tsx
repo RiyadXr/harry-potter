@@ -6,6 +6,7 @@ interface HeaderProps {
     theme: HouseTheme;
     rewards: number;
     setView: (view: View) => void;
+    onCrestClick: () => void;
 }
 
 const HouseCrest: React.FC<{ house: House }> = ({ house }) => {
@@ -18,7 +19,7 @@ const HouseCrest: React.FC<{ house: House }> = ({ house }) => {
     return <span className="text-2xl">{crests[house]}</span>;
 };
 
-const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView }) => {
+const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView, onCrestClick }) => {
     return (
         <header className={`p-3 sm:p-4 rounded-t-lg shadow-lg flex justify-between items-center transition-colors duration-500 ${theme.primary} ${theme.text} animate-slide-down`}>
             <div className="flex items-center">
@@ -36,10 +37,14 @@ const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView }) => {
                         <span className="font-bold text-base">{rewards}</span>
                         <span className="text-xl" role="img" aria-label="Galleons">💰</span>
                     </button>
-                    <div className={`flex items-center space-x-2 px-2 py-1 rounded-lg ${theme.secondary} transition-all-smooth`}>
+                    <button
+                        onClick={onCrestClick}
+                        aria-label={`View details for ${house} house`}
+                        className={`flex items-center space-x-2 px-2 py-1 rounded-lg ${theme.secondary} transition-all-smooth hover:shadow-inner hover:brightness-110`}
+                    >
                         <HouseCrest house={house} />
                         <span className="hidden md:block font-magic text-sm">{house}</span>
-                    </div>
+                    </button>
                 </div>
             )}
         </header>

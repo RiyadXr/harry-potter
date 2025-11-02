@@ -11,6 +11,7 @@ import LoadingScreen from './components/LoadingScreen';
 import Modal from './components/Modal';
 import Test from './components/Test';
 import Shop from './components/Shop';
+import HouseDetails from './components/HouseDetails';
 import { House, View, JournalEntry, Task, Mood, ShopItem } from './types';
 import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
 import { getOwlAnswer } from './services/geminiService';
@@ -36,6 +37,9 @@ const App: React.FC = () => {
     const [owlQuestion, setOwlQuestion] = useState('');
     const [owlAnswer, setOwlAnswer] = useState('');
     const [isOwlThinking, setIsOwlThinking] = useState(false);
+
+    // House Details Modal state
+    const [isHouseModalOpen, setIsHouseModalOpen] = useState(false);
 
     const userName = "Onamika";
 
@@ -104,7 +108,7 @@ const App: React.FC = () => {
         let intervalId: ReturnType<typeof setTimeout>;
         let timeoutId: ReturnType<typeof setTimeout>;
         const showBroom = () => {
-            if (view !== View.Sorting && !showFactModal && !isOwlModalOpen) {
+            if (view !== View.Sorting && !showFactModal && !isOwlModalOpen && !isHouseModalOpen) {
                 setIsBroomVisible(true);
                 timeoutId = setTimeout(() => setIsBroomVisible(false), 15000);
             }
@@ -115,7 +119,7 @@ const App: React.FC = () => {
         };
         setRandomInterval();
         return () => { clearTimeout(intervalId); clearTimeout(timeoutId); };
-    }, [view, showFactModal, isOwlModalOpen]);
+    }, [view, showFactModal, isOwlModalOpen, isHouseModalOpen]);
 
     const theme = useMemo(() => {
         return house ? HOUSE_THEMES[house] : {
@@ -216,7 +220,7 @@ const App: React.FC = () => {
                 </svg>
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
-                <Header house={house} theme={theme} rewards={rewards} setView={handleSetView} />
+                <Header house={house} theme={theme} rewards={rewards} setView={handleSetView} onCrestClick={() => setIsHouseModalOpen(true)} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
                     <div key={view} className="animate-fade-in">
                         {renderView()}
@@ -298,6 +302,17 @@ const App: React.FC = () => {
                             </div>
                         </div>
                     )}
+                </Modal>
+            )}
+            
+            {isHouseModalOpen && house && (
+                <Modal
+                    title={`${house} Common Room`}
+                    onClose={() => setIsHouseModalOpen(false)}
+                    theme={theme}
+                    footerButtonText="Return"
+                >
+                    <HouseDetails house={house} theme={theme} />
                 </Modal>
             )}
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem } from './types';
+import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem, HouseInfo } from './types';
 
 export const HOUSE_THEMES: Record<House, HouseTheme> = {
     [House.Gryffindor]: {
@@ -188,3 +188,42 @@ export const SHOP_ITEMS: ShopItem[] = [
     { id: 'sword', name: "Sword of Gryffindor", description: "Only a true Gryffindor could have pulled that out of the hat.", price: 2000, icon: '⚔️' },
     { id: 'elderwand', name: "The Elder Wand", description: "The most powerful wand ever made. The Wand of Destiny.", price: 5000, icon: '🪄' },
 ];
+
+export const HOUSE_DETAILS: Record<House, HouseInfo> = {
+    [House.Gryffindor]: {
+        founder: "Godric Gryffindor",
+        animal: "Lion",
+        colors: "Scarlet and Gold",
+        element: "Fire",
+        trait: "Courage, bravery, nerve, and chivalry",
+        description: "Gryffindor values bravery, daring, nerve, and chivalry. Its emblematic animal is the lion and its colours are scarlet and gold. The house corresponds roughly to the element of fire.",
+        students: ["Harry Potter", "Hermione Granger", "Ron Weasley", "Albus Dumbledore", "Minerva McGonagall", "Neville Longbottom"]
+    },
+    [House.Slytherin]: {
+        founder: "Salazar Slytherin",
+        animal: "Serpent",
+        colors: "Green and Silver",
+        element: "Water",
+        trait: "Ambition, cunning, leadership, and resourcefulness",
+        description: "Slytherin values ambition, cunning, leadership, and resourcefulness. Its emblematic animal is the serpent, and its colours are emerald green and silver. The house corresponds roughly to the element of water.",
+        students: ["Tom Riddle (Lord Voldemort)", "Severus Snape", "Draco Malfoy", "Bellatrix Lestrange", "Horace Slughorn", "Lucius Malfoy"]
+    },
+    [House.Ravenclaw]: {
+        founder: "Rowena Ravenclaw",
+        animal: "Eagle",
+        colors: "Blue and Bronze",
+        element: "Air",
+        trait: "Intelligence, creativity, learning, and wit",
+        description: "Ravenclaw values intelligence, creativity, learning, and wit. Its emblematic animal is an eagle and its colours are blue and bronze. The house corresponds roughly to the element of air.",
+        students: ["Luna Lovegood", "Gilderoy Lockhart", "Filius Flitwick", "Cho Chang", "Sybill Trelawney", "Garrick Ollivander"]
+    },
+    [House.Hufflepuff]: {
+        founder: "Helga Hufflepuff",
+        animal: "Badger",
+        colors: "Yellow and Black",
+        element: "Earth",
+        trait: "Hard work, dedication, patience, loyalty, and fair play",
+        description: "Hufflepuff values hard work, patience, justice, and loyalty. Its emblematic animal is the badger, and its colours are yellow and black. The house corresponds roughly to the element of earth.",
+        students: ["Cedric Diggory", "Nymphadora Tonks", "Newt Scamander", "Pomona Sprout", "Theseus Scamander", "Hannah Abbott"]
+    }
+};
