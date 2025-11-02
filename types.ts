@@ -1,4 +1,3 @@
-// FIX: Removed a self-import of 'House' that was causing a conflict with its own declaration.
 export enum House {
     Gryffindor = 'Gryffindor',
     Slytherin = 'Slytherin',
@@ -109,4 +108,12 @@ export interface HarryPotterCharacter {
 export interface CharacterMatchResult {
     characterName: string;
     reasoning: string;
+}
+
+export interface FloatingReward {
+    id: number;
+    x: number;
+    y: number;
+    reward: 50 | 100;
+    icon: string;
 }

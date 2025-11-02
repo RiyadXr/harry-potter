@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import Journal from './components/Journal';
@@ -12,9 +12,9 @@ import Modal from './components/Modal';
 import Test from './components/Test';
 import Shop from './components/Shop';
 import HouseDetails from './components/HouseDetails';
-import { House, View, JournalEntry, Task, Mood, ShopItem } from './types';
+import { House, View, JournalEntry, Task, Mood, ShopItem, FloatingReward } from './types';
 import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
-import { getOwlAnswer } from './services/geminiService';
+import { getOwlAnswer, generateRewardMessage } from './services/geminiService';
 
 const App: React.FC = () => {
     const [view, setView] = useState<View>(View.Journal);
@@ -40,6 +40,18 @@ const App: React.FC = () => {
 
     // House Details Modal state
     const [isHouseModalOpen, setIsHouseModalOpen] = useState(false);
+
+    // Floating Reward state
+    const [floatingReward, setFloatingReward] = useState<FloatingReward | null>(null);
+    const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
+    const [rewardMessage, setRewardMessage] = useState<string>('');
+    const [isGeneratingMessage, setIsGeneratingMessage] = useState(false);
+    const [lastReward, setLastReward] = useState(0);
+
+    // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
+    const rewardTimerRef = useRef<ReturnType<typeof setTimeout>>();
+    // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
+    const rewardDisappearTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
     const userName = "Onamika";
 
@@ -76,7 +88,6 @@ const App: React.FC = () => {
             const storedPurchasedItems = localStorage.getItem('potterJournalPurchases');
             if (storedPurchasedItems) {
                 const parsedItems = JSON.parse(storedPurchasedItems);
-                // Gracefully handle migration from old string[] format to new Record<string, number> format
                 if (Array.isArray(parsedItems)) {
                     const newItems = parsedItems.reduce((acc, id) => ({ ...acc, [id]: 1 }), {});
                     setPurchasedItems(newItems);
@@ -189,6 +200,70 @@ const App: React.FC = () => {
             }));
         }
     };
+    
+    // --- Floating Reward Logic ---
+    const clearRewardTimers = () => {
+        if (rewardTimerRef.current) clearTimeout(rewardTimerRef.current);
+        if (rewardDisappearTimerRef.current) clearTimeout(rewardDisappearTimerRef.current);
+    };
+    
+    const scheduleNextReward = useCallback(() => {
+        clearRewardTimers();
+        const randomDelay = Math.random() * 60000 + 45000; // 45-105 seconds
+        rewardTimerRef.current = setTimeout(() => {
+            const rewardAmount = (Math.random() < 0.5 ? 50 : 100) as 50 | 100;
+            setFloatingReward({
+                id: Date.now(),
+                x: Math.random() * 80 + 10,
+                y: Math.random() * 70 + 15,
+                reward: rewardAmount,
+                icon: '✨'
+            });
+            rewardDisappearTimerRef.current = setTimeout(() => {
+                setFloatingReward(null);
+                scheduleNextReward();
+            }, 12000); // Disappear after 12 seconds
+        }, randomDelay);
+    }, []);
+
+    useEffect(() => {
+        const isAnyModalOpen = isRewardModalOpen || showFactModal || isOwlModalOpen || isHouseModalOpen;
+        if (view !== View.Sorting && !isAnyModalOpen && !floatingReward) {
+            scheduleNextReward();
+        } else {
+            clearRewardTimers();
+            if (isAnyModalOpen && floatingReward) {
+                setFloatingReward(null);
+            }
+        }
+        return () => clearRewardTimers();
+    }, [view, isRewardModalOpen, showFactModal, isOwlModalOpen, isHouseModalOpen, floatingReward, scheduleNextReward]);
+
+    const handleFloatingRewardClick = async (reward: FloatingReward) => {
+        clearRewardTimers();
+        setFloatingReward(null);
+        addRewards(reward.reward);
+        setLastReward(reward.reward);
+        setIsRewardModalOpen(true);
+        setIsGeneratingMessage(true);
+
+        const apiKey = localStorage.getItem('geminiApiKey');
+        if (!apiKey) {
+            setRewardMessage("You caught a spark of magic! A brilliant display of reflexes.");
+            setIsGeneratingMessage(false);
+            return;
+        }
+
+        const message = await generateRewardMessage(reward.reward, userName, apiKey);
+        setRewardMessage(message);
+        setIsGeneratingMessage(false);
+    };
+
+    const handleCloseRewardModal = () => {
+        setIsRewardModalOpen(false);
+        setRewardMessage('');
+        scheduleNextReward();
+    };
 
     if(isLoading) {
         return <LoadingScreen userName={userName} />;
@@ -210,15 +285,6 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen">
-             <button
-                onClick={() => window.location.reload()}
-                aria-label="Force refresh page"
-                className={`fixed top-3 right-3 z-50 w-8 h-8 flex items-center justify-center ${theme.secondary} bg-opacity-70 backdrop-blur-sm rounded-full shadow-lg cursor-pointer hover:bg-opacity-90 transition-all-smooth`}
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${theme.accent}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.182-3.182m0-11.667a8.25 8.25 0 00-11.667 0L2.985 7.982" />
-                </svg>
-            </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
                 <Header house={house} theme={theme} rewards={rewards} setView={handleSetView} onCrestClick={() => setIsHouseModalOpen(true)} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
@@ -313,6 +379,43 @@ const App: React.FC = () => {
                     footerButtonText="Return"
                 >
                     <HouseDetails house={house} theme={theme} />
+                </Modal>
+            )}
+
+             {floatingReward && (
+                <button
+                    onClick={() => handleFloatingRewardClick(floatingReward)}
+                    className="fixed z-40 text-5xl animate-float animate-pop-in cursor-pointer"
+                    style={{
+                        left: `${floatingReward.x}%`,
+                        top: `${floatingReward.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                        filter: 'drop-shadow(0 0 15px #fef08a)'
+                    }}
+                    aria-label={`Claim a magical reward`}
+                >
+                    {floatingReward.icon}
+                </button>
+            )}
+
+            {isRewardModalOpen && (
+                <Modal
+                    title="A Magical Boon!"
+                    onClose={handleCloseRewardModal}
+                    theme={theme}
+                    footerButtonText="Wonderful!"
+                >
+                    {isGeneratingMessage ? (
+                        <div className="text-center p-8 flex flex-col items-center justify-center space-y-4 min-h-[120px]">
+                            <div className={`animate-spin-slow ${theme.accent}`}>✨</div>
+                            <p className={`${theme.text}`}>The magic is revealing its message...</p>
+                        </div>
+                    ) : (
+                        <div className="text-center">
+                            <p className="text-lg italic mb-4">"{rewardMessage}"</p>
+                            <p className={`font-magic text-2xl ${theme.accent}`}>You've been awarded {lastReward} Galleons!</p>
+                        </div>
+                    )}
                 </Modal>
             )}
 

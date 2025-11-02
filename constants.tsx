@@ -40,6 +40,16 @@ export const WIZARDING_FACTS: string[] = [
     "Fred and George Weasley were born on April Fool's Day.",
     "A wizard who cannot perform magic is known as a Squib.",
     "The Knight Bus emergency number is 6-2-4-4-2 (MAGIC on a phone keypad).",
+    "The inscription on the Mirror of Erised reads 'Erised stra ehru oyt ube cafru oyt on wohsi,' which is 'I show not your face but your heart's desire' backwards.",
+    "Harry Potter and author J.K. Rowling share the same birthday: July 31st.",
+    "Moaning Myrtle's full name is Myrtle Elizabeth Warren.",
+    "The actress who played Moaning Myrtle, Shirley Henderson, was 37 at the time, making her the oldest actor to portray a Hogwarts student.",
+    "The core of Bellatrix Lestrange's wand is dragon heartstring, and it was made of walnut wood.",
+    "The Hogwarts Express engine is a GWR 4900 Class 5972 Olton Hall, built in 1937.",
+    "A portrait of Anne Boleyn, Henry VIII's second wife, can be seen in the Hogwarts staircase, leading to theories that she was a witch.",
+    "The Ministry of Magic has a 'Muggle-Worthy Excuse Committee' which creates reasons for magical mishaps in the Muggle world.",
+    "Alfonso Cuarón, director of 'Prisoner of Azkaban', had the main trio write essays about their characters. Emma Watson wrote 16 pages, Daniel Radcliffe wrote one, and Rupert Grint never turned his in.",
+    "A Patronus is a projection of one's most positive feelings and takes the form of an animal unique to each individual.",
 ];
 
 export const POTIONS: { name: string, color: string }[] = [
@@ -125,6 +135,56 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
         options: ["Draco Malfoy", "Harry Potter", "Tom Riddle", "Severus Snape"],
         correctAnswer: "Tom Riddle"
     },
+    {
+        question: "What is the name of Hagrid's giant pet spider?",
+        options: ["Shelob", "Aragog", "Mosag", "Acromantula"],
+        correctAnswer: "Aragog"
+    },
+    {
+        question: "What is the name of the mischievous poltergeist at Hogwarts?",
+        options: ["The Bloody Baron", "Peeves", "Nearly Headless Nick", "The Grey Lady"],
+        correctAnswer: "Peeves"
+    },
+    {
+        question: "What does the Memory Charm 'Obliviate' do?",
+        options: ["Erases memories", "Unlocks doors", "Creates a shield", "Confuses the target"],
+        correctAnswer: "Erases memories"
+    },
+    {
+        question: "What is the name of the street where the Dursleys live?",
+        options: ["Spinner's End", "Godric's Hollow", "Privet Drive", "Diagon Alley"],
+        correctAnswer: "Privet Drive"
+    },
+    {
+        question: "What is the name of Hermione's cat?",
+        options: ["Scabbers", "Mrs. Norris", "Crookshanks", "Hedwig"],
+        correctAnswer: "Crookshanks"
+    },
+    {
+        question: "What is the name of the Weasley family's home?",
+        options: ["The Leaky Cauldron", "Malfoy Manor", "Number 12, Grimmauld Place", "The Burrow"],
+        correctAnswer: "The Burrow"
+    },
+    {
+        question: "What magical object is used to review and revisit memories?",
+        options: ["The Mirror of Erised", "A Time-Turner", "A Pensieve", "The Deluminator"],
+        correctAnswer: "A Pensieve"
+    },
+    {
+        question: "What is the name of the main wizarding bank in Diagon Alley?",
+        options: ["The Ministry of Magic", "Gringotts", "Azkaban", "Flourish and Blotts"],
+        correctAnswer: "Gringotts"
+    },
+    {
+        question: "Who is the Transfiguration professor and Head of Gryffindor?",
+        options: ["Severus Snape", "Filius Flitwick", "Pomona Sprout", "Minerva McGonagall"],
+        correctAnswer: "Minerva McGonagall"
+    },
+    {
+        question: "What is the function of a Remembrall?",
+        options: ["It shows you the future", "It glows red when you've forgotten something", "It replays your happiest memories", "It whispers secrets"],
+        correctAnswer: "It glows red when you've forgotten something"
+    }
 ];
 
 export const WIZARDING_TASKS_POOL: Omit<DailyTask, 'completed'>[] = [

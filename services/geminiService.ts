@@ -216,3 +216,26 @@ Provide your analysis in a JSON format.`;
          return { characterName: "Nearly Headless Nick", reasoning: "A ghostly interference has clouded the divination. It seems the magical wires were crossed. Please try to connect with the spirits again later." };
     }
 };
+
+export const generateRewardMessage = async (rewardAmount: number, userName: string, apiKey: string): Promise<string> => {
+    if (!apiKey) {
+        return "You caught a spark of magic! A brilliant display of reflexes.";
+    }
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const systemInstruction = `You are Albus Dumbledore, the wise Headmaster of Hogwarts. You are writing a short, encouraging, and unique message to a student named ${userName}. They have just caught a fleeting magical spark and were awarded ${rewardAmount} Galleons for their quick reflexes. Your tone should be wise, whimsical, and never longer than two sentences.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: "Craft the message.",
+            config: {
+                systemInstruction: systemInstruction,
+            }
+        });
+        return response.text;
+    } catch (error) {
+        console.error("Error generating reward message from Gemini:", error);
+        return "It seems you've found a bit of wandering magic! Well done.";
+    }
+};
