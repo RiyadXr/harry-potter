@@ -7,6 +7,8 @@ interface HeaderProps {
     rewards: number;
     setView: (view: View) => void;
     onCrestClick: () => void;
+    isMuted: boolean;
+    toggleMute: () => void;
 }
 
 const HouseCrest: React.FC<{ house: House }> = ({ house }) => {
@@ -19,7 +21,7 @@ const HouseCrest: React.FC<{ house: House }> = ({ house }) => {
     return <span className="text-2xl">{crests[house]}</span>;
 };
 
-const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView, onCrestClick }) => {
+const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView, onCrestClick, isMuted, toggleMute }) => {
     return (
         <header className={`p-3 sm:p-4 rounded-t-lg shadow-lg flex justify-between items-center transition-colors duration-500 ${theme.primary} ${theme.text} animate-slide-down`}>
             <div className="flex items-center">
@@ -29,6 +31,13 @@ const Header: React.FC<HeaderProps> = ({ house, theme, rewards, setView, onCrest
             </div>
             {house && (
                 <div className="flex items-center space-x-2">
+                     <button
+                        onClick={toggleMute}
+                        aria-label={isMuted ? "Unmute music" : "Mute music"}
+                        className={`flex items-center justify-center p-2 rounded-lg ${theme.secondary} transition-all-smooth hover:shadow-inner hover:brightness-110`}
+                     >
+                        <span className="text-xl">{isMuted ? '🔇' : '🔊'}</span>
+                    </button>
                      <button 
                         onClick={() => setView(View.Shop)}
                         aria-label="Open the shop"
