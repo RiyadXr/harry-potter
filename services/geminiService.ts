@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { House, SortingResult } from '../types';
+import { House, SortingResult, DailyProphetArticle } from '../types';
 
 export const getSortingHatDecision = async (answers: string[], apiKey: string): Promise<SortingResult> => {
     
@@ -65,6 +65,68 @@ export const getSortingHatDecision = async (answers: string[], apiKey: string): 
         return {
             house: House.Hufflepuff,
             reasoning: "The connection to the headmaster's office is fuzzy... but I sense great loyalty in you. Better be... Hufflepuff!"
+        };
+    }
+};
+
+export const generateDailyProphetArticle = async (summary: string, userName: string, apiKey: string): Promise<DailyProphetArticle> => {
+    if (!apiKey) {
+        console.error("API key was not provided to the Quick-Quotes Quill.");
+        return {
+            headline: "Quill Runs Dry!",
+            article: "The magical Quick-Quotes Quill has sputtered to a halt. It seems the Headmaster's secret key is required to replenish its ink. Please ensure the key is correctly configured in the Sorting Hat screen."
+        };
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
+    const prompt = `You are a witty, slightly dramatic journalist for the Daily Prophet, the premier newspaper of the wizarding world. Your task is to take a brief summary of a witch or wizard's day and turn it into a short, sensationalized newspaper article. The witch's name is ${userName}. Always maintain a magical, Harry Potter-esque tone. Be creative and whimsical.
+
+Here is the summary of ${userName}'s day: "${summary}".
+
+Now, write a Daily Prophet article about it.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        headline: {
+                            type: Type.STRING,
+                            description: 'A catchy, sensationalized headline for the article.'
+                        },
+                        article: {
+                            type: Type.STRING,
+                            description: 'The body of the newspaper article, written in a dramatic, wizarding-world style.'
+                        }
+                    },
+                    required: ['headline', 'article']
+                }
+            }
+        });
+
+        const text = response.text;
+        const result = JSON.parse(text);
+
+        if (typeof result.headline === 'string' && typeof result.article === 'string') {
+            return result as DailyProphetArticle;
+        } else {
+            console.error("Invalid response format from Gemini for Daily Prophet:", result);
+            return {
+                headline: "Communication Disruption!",
+                article: "An owl carrying our correspondent's report seems to have been caught in a magical squall. The message is scrambled. Please try again later."
+            };
+        }
+
+    } catch (error) {
+        console.error("Error calling Gemini API for Daily Prophet:", error);
+        return {
+            headline: "Communication Disruption!",
+            article: "An owl carrying our correspondent's report seems to have been caught in a magical squall. The message is scrambled. Please try again later."
         };
     }
 };

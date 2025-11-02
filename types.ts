@@ -67,3 +67,8 @@ export interface Exam {
     icon: string;
     questions: TriviaQuestion[];
 }
+
+export interface DailyProphetArticle {
+    headline: string;
+    article: string;
+}
