@@ -20,7 +20,6 @@ const Header: React.FC<HeaderProps> = ({ house, theme }) => {
     return (
         <header className={`p-3 sm:p-4 rounded-t-lg shadow-lg flex justify-between items-center transition-colors duration-500 ${theme.primary} ${theme.text} animate-slide-down`}>
             <div className="flex items-center">
-                <span className="text-3xl mr-2 sm:mr-4">💌</span>
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-magic">
                     Onamika's Potter Journal
                 </h1>
