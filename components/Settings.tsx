@@ -81,7 +81,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                     <p className="mb-3">A message has arrived for you by owl post.</p>
                     <button 
                         onClick={() => setIsLetterOpen(true)}
-                        className={`px-4 py-2 rounded-lg shadow-md transition-all ${theme.primary} hover:opacity-80 flex items-center space-x-2`}
+                        className={`px-4 py-2 rounded-lg shadow-md transition-all-smooth ${theme.primary} hover:opacity-80 flex items-center space-x-2`}
                     >
                         <span>Open the Letter</span>
                         <span>{ICONS.ENVELOPE}</span>
@@ -99,7 +99,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                     <button 
                         onClick={handleStartTrivia}
                         disabled={!house}
-                        className={`px-4 py-2 rounded-lg shadow-md transition-all ${!house ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
+                        className={`px-4 py-2 rounded-lg shadow-md transition-all-smooth ${!house ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
                     >
                         Attempt the Challenge
                     </button>
@@ -142,7 +142,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
 
                         <div className="space-y-2 mb-4">
                             {currentQuestion.options.map(option => (
-                                <label key={option} className="flex items-center p-3 rounded-lg bg-black/20 cursor-pointer">
+                                <label key={option} className="flex items-center p-3 rounded-lg bg-black/20 cursor-pointer transition-all-smooth">
                                     <input 
                                         type="radio" 
                                         name="trivia-option" 
@@ -160,14 +160,14 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse }) => {
                                 type="button"
                                 onClick={handleCloseModal}
                                 disabled={!!feedback}
-                                className={`px-6 py-2 rounded-lg shadow-md transition-all ${!!feedback ? 'bg-gray-500 cursor-not-allowed' : `${theme.secondary} hover:opacity-80`}`}
+                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth ${!!feedback ? 'bg-gray-500 cursor-not-allowed' : `${theme.secondary} hover:opacity-80`}`}
                             >
                                 Cancel
                             </button>
                             <button 
                                 type="submit" 
                                 disabled={!selectedAnswer || !!feedback}
-                                className={`px-6 py-2 rounded-lg shadow-md transition-all ${!selectedAnswer || !!feedback ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
+                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth ${!selectedAnswer || !!feedback ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
                             >
                                 Submit Answer
                             </button>

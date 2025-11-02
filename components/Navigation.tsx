@@ -21,7 +21,7 @@ const NavButton: React.FC<{
     return (
         <button
             onClick={() => setView(view)}
-            className={`flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors duration-300 ${isActive ? theme.accent : 'opacity-70'}`}
+            className={`flex flex-col items-center justify-center w-full pt-2 pb-1 transition-all-smooth ${isActive ? theme.accent : 'opacity-70'}`}
         >
             <span className="text-2xl">{icon}</span>
             <span className={`text-xs font-magic ${isActive ? 'font-bold' : ''}`}>{label}</span>
@@ -43,7 +43,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, theme, ho
     ];
 
     return (
-        <nav className={`fixed bottom-0 left-0 right-0 h-20 shadow-top-lg grid grid-cols-6 justify-around items-center sm:max-w-4xl sm:mx-auto sm:rounded-b-lg ${theme.primary} ${theme.text}`}>
+        <nav className={`fixed bottom-0 left-0 right-0 h-20 shadow-top-lg grid grid-cols-6 justify-around items-center sm:max-w-4xl sm:mx-auto sm:rounded-b-lg ${theme.primary} ${theme.text} animate-slide-up`}>
            {navItems.map(item => (
                 <NavButton
                     key={item.label}

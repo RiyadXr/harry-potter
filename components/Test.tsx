@@ -73,7 +73,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
                 </div>
                 <button
                     onClick={handleTakeAnotherExam}
-                    className={`mt-6 px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
+                    className={`mt-6 px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
                 >
                     Take Another Exam
                 </button>
@@ -84,7 +84,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
     if (currentExam) {
         const question = currentExam.questions[questionIndex];
         return (
-            <div className={`${theme.text}`}>
+            <div className={`${theme.text} animate-fade-in`} key={questionIndex}>
                 <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>{currentExam.name}</h2>
                 <p className="mb-6 text-sm opacity-80">Question {questionIndex + 1} of {currentExam.questions.length}</p>
                 
@@ -92,7 +92,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
                     <h3 className="text-xl sm:text-2xl mb-6">{question.question}</h3>
                     <div className="space-y-3 mb-6">
                         {question.options.map(option => (
-                            <label key={option} className={`flex items-center p-3 rounded-lg cursor-pointer transition-all ${selectedAnswer === option ? `${theme.primary}` : 'bg-black/20'}`}>
+                            <label key={option} className={`flex items-center p-3 rounded-lg cursor-pointer transition-all-smooth ${selectedAnswer === option ? `${theme.primary}` : 'bg-black/20'}`}>
                                 <input 
                                     type="radio" 
                                     name="exam-option" 
@@ -101,7 +101,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
                                     onChange={() => setSelectedAnswer(option)}
                                     className="sr-only"
                                 />
-                                <div className={`h-5 w-5 rounded-full border-2 flex-shrink-0 ${theme.border} ${selectedAnswer === option ? 'bg-yellow-400' : ''}`}></div>
+                                <div className={`h-5 w-5 rounded-full border-2 flex-shrink-0 transition-all-smooth ${theme.border} ${selectedAnswer === option ? 'bg-yellow-400' : ''}`}></div>
                                 <span className="ml-3">{option}</span>
                             </label>
                         ))}
@@ -110,7 +110,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
                         <button
                             onClick={handleAnswerSubmit}
                             disabled={!selectedAnswer}
-                            className={`px-6 py-2 rounded-lg shadow-md transition-all ${!selectedAnswer ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
+                            className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth ${!selectedAnswer ? 'bg-gray-500 cursor-not-allowed' : `${theme.primary} hover:opacity-80`}`}
                         >
                             Next Question
                         </button>
@@ -127,7 +127,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
             <div className="flex justify-center">
                  <button
                     onClick={handleBeginExam}
-                    className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-transform ${theme.primary}`}
+                    className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-all-smooth ${theme.primary}`}
                 >
                     <span className="text-5xl mb-3">📜</span>
                     <h3 className="font-magic text-xl">Begin Examination</h3>

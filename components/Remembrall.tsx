@@ -53,19 +53,20 @@ const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userNam
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
                     placeholder="Add a magical task..."
-                    className={`flex-grow p-2 rounded-md bg-transparent border-2 ${theme.border} ${inputBg} focus:outline-none focus:ring-2 ${theme.border} transition-all`}
+                    className={`flex-grow p-2 rounded-md bg-transparent border-2 ${theme.border} ${inputBg} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
                 />
-                <button type="submit" className={`px-4 py-2 ${theme.primary} rounded-lg shadow-md hover:scale-105 transition-transform`}>
+                <button type="submit" className={`px-4 py-2 ${theme.primary} rounded-lg shadow-md hover:scale-105 transition-all-smooth`}>
                     Add
                 </button>
             </form>
             <ul className="space-y-2 max-h-96 overflow-y-auto pr-2">
-                {tasks.map(task => (
+                {tasks.map((task, index) => (
                     <li
                         key={task.id}
-                        className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                        className={`flex items-center justify-between p-3 rounded-lg animate-fade-in-up transition-all-smooth ${
                             task.completed ? `${inputBg} opacity-60` : `${inputBg}`
                         }`}
+                        style={{ animationDelay: `${index * 50}ms` }}
                     >
                         <span
                             className={`cursor-pointer ${task.completed ? 'line-through' : ''}`}
@@ -73,7 +74,7 @@ const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userNam
                         >
                             {task.text}
                         </span>
-                        <button onClick={() => deleteTask(task.id)} className="text-red-400 hover:text-red-600">
+                        <button onClick={() => deleteTask(task.id)} className="text-red-400 hover:text-red-600 transition-all-smooth">
                             &times;
                         </button>
                     </li>

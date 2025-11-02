@@ -70,10 +70,11 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
             </p>
             
             <div className="space-y-4">
-                {tasks.map(task => (
+                {tasks.map((task, index) => (
                     <label 
                         key={task.id}
-                        className={`p-4 rounded-lg flex items-center cursor-pointer transition-all duration-300 border-2 ${theme.border} ${task.completed ? `bg-green-800/30` : `bg-black/10`}`}
+                        className={`p-4 rounded-lg flex items-center cursor-pointer transition-all-smooth border-2 ${theme.border} ${task.completed ? `bg-green-800/30` : `bg-black/10`} animate-fade-in-up`}
+                        style={{ animationDelay: `${index * 75}ms` }}
                     >
                         <input
                             type="checkbox"
@@ -83,14 +84,14 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
                         />
                          {/* Custom checkbox visual */}
                         <div className="relative h-6 w-6 flex-shrink-0">
-                            <div className={`h-6 w-6 rounded-md bg-transparent border-2 ${theme.border}`}></div>
+                            <div className={`h-6 w-6 rounded-md bg-transparent border-2 ${theme.border} transition-all-smooth`}></div>
                             {task.completed && (
-                                <span className={`absolute inset-0 flex items-center justify-center text-2xl ${theme.accent}`}>
+                                <span className={`absolute inset-0 flex items-center justify-center text-2xl ${theme.accent} animate-pop-in`}>
                                     ✓
                                 </span>
                             )}
                         </div>
-                        <span className={`ml-4 text-lg ${task.completed ? 'line-through opacity-70' : ''}`}>
+                        <span className={`ml-4 text-lg transition-all-smooth ${task.completed ? 'line-through opacity-70' : ''}`}>
                             {task.text} <span className="text-sm opacity-80">({task.realTask})</span>
                         </span>
                     </label>

@@ -81,9 +81,9 @@ const SortingHat: React.FC<SortingHatProps> = ({ onSort, theme, userName }) => {
                         value={keyInput}
                         onChange={(e) => setKeyInput(e.target.value)}
                         placeholder="Paste your API Key here"
-                        className={`w-full p-2 rounded-md bg-transparent border-2 ${theme.border} focus:outline-none focus:ring-2 ${theme.border}`}
+                        className={`w-full p-2 rounded-md bg-transparent border-2 ${theme.border} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
                     />
-                    <button type="submit" className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
+                    <button type="submit" className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
                         Save Key & Begin
                     </button>
                     {error && <p className="text-red-400 mt-2">{error}</p>}
@@ -95,7 +95,7 @@ const SortingHat: React.FC<SortingHatProps> = ({ onSort, theme, userName }) => {
     if (isLoading) {
         return (
             <div className="text-center p-8 flex flex-col items-center justify-center space-y-6 min-h-[300px]">
-                <div className={`animate-spin-slow ${theme.accent}`}>
+                <div className={`animate-spin-slow animate-magical-glow ${theme.accent} text-2xl`}>
                     {ICONS.SPARKLES}
                 </div>
                 <h2 className={`text-3xl font-magic ${theme.accent} animate-pulse`}>The Sorting Hat is thinking...</h2>
@@ -130,14 +130,14 @@ const SortingHat: React.FC<SortingHatProps> = ({ onSort, theme, userName }) => {
             <h2 className="text-2xl sm:text-3xl font-magic mb-2">Welcome to Hogwarts, {userName}!</h2>
             <p className="mb-6">Answer the questions to be sorted into your house.</p>
             
-            <div className={`p-4 sm:p-6 rounded-lg border-2 ${theme.border} bg-black bg-opacity-10`}>
+            <div key={currentQuestion} className={`p-4 sm:p-6 rounded-lg border-2 ${theme.border} bg-black bg-opacity-10 animate-fade-in`}>
                 <h3 className="text-xl sm:text-2xl mb-6">{question.question}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {question.options.map(option => (
                         <button
                             key={option.value}
                             onClick={() => handleAnswer(option.value)}
-                            className={`p-4 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text}`}
+                            className={`p-4 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text}`}
                         >
                             {option.text}
                         </button>

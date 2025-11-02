@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { House, HouseTheme, TriviaQuestion, DailyTask } from './types';
 
@@ -57,6 +58,7 @@ export const POTIONS: { name: string, color: string }[] = [
 export const ICONS = {
     QUILL: <span className="mr-2">✒️</span>,
     EDIT: <>✏️</>,
+    DELETE: <>🗑️</>,
     SPARKLES: <>✨</>,
     BROOM: <>🧹</>,
     OWL: <>🦉</>,

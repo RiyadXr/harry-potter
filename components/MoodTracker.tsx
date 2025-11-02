@@ -40,7 +40,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme }) => 
             const mood = getMoodForDate(day, month, year);
             const isToday = day === today.getDate();
             calendarDays.push(
-                <div key={day} className={`w-full aspect-square rounded-full flex items-center justify-center text-xs border-2 transition-all ${isToday ? theme.border : 'border-transparent'} ${mood ? mood.color : theme.primary.replace('bg-','bg-opacity-20 ')}`}>
+                <div key={day} className={`w-full aspect-square rounded-full flex items-center justify-center text-xs border-2 transition-all-smooth ${isToday ? theme.border : 'border-transparent'} ${mood ? mood.color : theme.primary.replace('bg-','bg-opacity-20 ')}`}>
                     {day}
                 </div>
             );
@@ -58,7 +58,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme }) => 
                     <button
                         key={potion.name}
                         onClick={() => addMood(potion)}
-                        className={`p-2 rounded-lg shadow-lg flex flex-col items-center justify-center transform hover:scale-105 transition-transform ${potion.color}`}
+                        className={`p-2 rounded-lg shadow-lg flex flex-col items-center justify-center transform hover:scale-105 transition-all-smooth ${potion.color}`}
                     >
                         <span className="text-2xl sm:text-4xl">🧪</span>
                         <span className="mt-2 text-center text-black font-bold font-magic text-xs sm:text-sm">{potion.name}</span>

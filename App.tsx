@@ -173,7 +173,7 @@ const App: React.FC = () => {
              <button
                 onClick={() => window.location.reload()}
                 aria-label="Force refresh page"
-                className={`fixed top-3 right-3 z-50 w-8 h-8 flex items-center justify-center ${theme.secondary} bg-opacity-70 backdrop-blur-sm rounded-full shadow-lg cursor-pointer hover:bg-opacity-90 transition-all`}
+                className={`fixed top-3 right-3 z-50 w-8 h-8 flex items-center justify-center ${theme.secondary} bg-opacity-70 backdrop-blur-sm rounded-full shadow-lg cursor-pointer hover:bg-opacity-90 transition-all-smooth`}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${theme.accent}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.182-3.182m0-11.667a8.25 8.25 0 00-11.667 0L2.985 7.982" />
@@ -181,8 +181,10 @@ const App: React.FC = () => {
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
                 <Header house={house} theme={theme} />
-                <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all duration-500 ${theme.secondary} ${theme.border} border-2`}>
-                    {renderView()}
+                <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
+                    <div key={view} className="animate-fade-in">
+                        {renderView()}
+                    </div>
                 </main>
                 <footer className={`font-magic text-center mt-6 ${theme.accent} opacity-70 px-4`}>
                     <p>"{footerFact}"</p>
@@ -194,7 +196,7 @@ const App: React.FC = () => {
                     <button
                         onClick={() => { setIsOwlModalOpen(true); setIsBroomVisible(false); }}
                         aria-label="Ask the wise owl a question"
-                        className="fixed bottom-24 left-4 sm:left-8 z-40 p-3 bg-gray-700 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-transform"
+                        className="fixed bottom-24 left-4 sm:left-8 z-40 p-3 bg-gray-700 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
                     >
                         <span className="text-3xl">{ICONS.OWL}</span>
                     </button>
@@ -202,7 +204,7 @@ const App: React.FC = () => {
                         <button
                             onClick={handleBroomClick}
                             aria-label="Get a wizarding world fact"
-                            className="fixed bottom-24 right-4 sm:right-8 z-40 p-3 bg-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-transform"
+                            className="fixed bottom-24 right-4 sm:right-8 z-40 p-3 bg-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
                         >
                             <span className="text-3xl">{ICONS.BROOM}</span>
                         </button>
@@ -226,14 +228,14 @@ const App: React.FC = () => {
                     {!owlAnswer && !isOwlThinking && (
                         <form onSubmit={handleAskOwl}>
                             <textarea
-                                className={`w-full p-3 rounded-md bg-transparent border-2 ${theme.border} ${theme.primary.replace('bg-', 'bg-opacity-20 ')} focus:outline-none focus:ring-2 ${theme.border} transition-all`}
+                                className={`w-full p-3 rounded-md bg-transparent border-2 ${theme.border} ${theme.primary.replace('bg-', 'bg-opacity-20 ')} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
                                 rows={3}
                                 placeholder="Ask about anything in the wizarding world..."
                                 value={owlQuestion}
                                 onChange={(e) => setOwlQuestion(e.target.value)}
                             />
                             <div className="text-center mt-4">
-                                <button type="submit" className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
+                                <button type="submit" className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
                                     Send Owl Post
                                 </button>
                             </div>
@@ -251,10 +253,10 @@ const App: React.FC = () => {
                                 <p className="whitespace-pre-wrap">{owlAnswer}</p>
                             </div>
                              <div className="text-center mt-4 flex justify-center space-x-4">
-                                <button onClick={() => setOwlAnswer('')} className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
+                                <button onClick={() => setOwlAnswer('')} className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
                                     Ask Another
                                 </button>
-                                <button onClick={handleCloseOwlModal} className={`px-6 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 ${theme.secondary} ${theme.text} font-magic`}>
+                                <button onClick={handleCloseOwlModal} className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.secondary} ${theme.text} font-magic`}>
                                     Close
                                 </button>
                             </div>
