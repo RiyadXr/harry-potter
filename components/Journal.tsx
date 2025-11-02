@@ -9,9 +9,10 @@ interface JournalProps {
     setEntries: React.Dispatch<React.SetStateAction<JournalEntry[]>>;
     theme: HouseTheme;
     userName: string;
+    addRewards: (amount: number) => void;
 }
 
-const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName }) => {
+const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName, addRewards }) => {
     const [newEntry, setNewEntry] = useState('');
     const [mood, setMood] = useState(POTIONS[0].name);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -42,6 +43,7 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName 
         };
         setEntries([entry, ...entries]);
         setNewEntry('');
+        addRewards(1);
     };
     
     const handleOpenGenerator = () => {

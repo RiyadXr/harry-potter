@@ -6,6 +6,7 @@ interface TestProps {
     theme: HouseTheme;
     userName: string;
     house: House | null;
+    addRewards: (amount: number) => void;
 }
 
 interface CurrentExam {
@@ -13,7 +14,7 @@ interface CurrentExam {
     questions: TriviaQuestion[];
 }
 
-const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
+const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
     const [currentExam, setCurrentExam] = useState<CurrentExam | null>(null);
     const [questionIndex, setQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -40,16 +41,22 @@ const Test: React.FC<TestProps> = ({ theme, userName, house }) => {
 
     const handleAnswerSubmit = () => {
         if (!selectedAnswer || !currentExam) return;
-
-        if (selectedAnswer === currentExam.questions[questionIndex].correctAnswer) {
-            setScore(score + 1);
-        }
-
-        setSelectedAnswer(null);
-
+    
+        const isCorrect = selectedAnswer === currentExam.questions[questionIndex].correctAnswer;
+    
         if (questionIndex < currentExam.questions.length - 1) {
-            setQuestionIndex(questionIndex + 1);
+            if (isCorrect) {
+                setScore(prevScore => prevScore + 1);
+            }
+            setSelectedAnswer(null);
+            setQuestionIndex(prevIndex => prevIndex + 1);
         } else {
+            // This is the last question. Finalize score and check for pass.
+            const finalScore = score + (isCorrect ? 1 : 0);
+            setScore(finalScore);
+            if (finalScore > currentExam.questions.length / 2) {
+                addRewards(10);
+            }
             setIsFinished(true);
         }
     };

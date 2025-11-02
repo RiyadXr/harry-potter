@@ -20,6 +20,7 @@ const App: React.FC = () => {
     const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [moods, setMoods] = useState<Mood[]>([]);
+    const [rewards, setRewards] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
     const [footerFact, setFooterFact] = useState('');
     
@@ -61,6 +62,11 @@ const App: React.FC = () => {
                 const parsedMoods = JSON.parse(storedMoods);
                 if(Array.isArray(parsedMoods)) setMoods(parsedMoods);
             }
+            const storedRewards = localStorage.getItem('potterJournalRewards');
+            if (storedRewards) {
+                const parsedRewards = parseInt(storedRewards, 10);
+                if (!isNaN(parsedRewards)) setRewards(parsedRewards);
+            }
         } catch (e) {
             console.error("Error hydrating app from localStorage. Resetting state.", e);
             localStorage.clear();
@@ -77,6 +83,7 @@ const App: React.FC = () => {
     useEffect(() => { if (!isLoading) localStorage.setItem('journalEntries', JSON.stringify(journalEntries)); }, [journalEntries, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('remembrallTasks', JSON.stringify(tasks)); }, [tasks, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('potionMoods', JSON.stringify(moods)); }, [moods, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('potterJournalRewards', rewards.toString()); }, [rewards, isLoading]);
     
     // Floating broom effect
     useEffect(() => {
@@ -151,20 +158,24 @@ const App: React.FC = () => {
         setOwlAnswer('');
     };
 
+    const addRewards = (amount: number) => {
+        setRewards(prev => prev + amount);
+    };
+
     if(isLoading) {
         return <LoadingScreen userName={userName} />;
     }
 
     const renderView = () => {
         switch (view) {
-            case View.Journal: return <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} />;
+            case View.Journal: return <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards} />;
             case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} />;
             case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} />;
-            case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} />;
+            case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} />;
             case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
-            case View.Test: return <Test theme={theme} userName={userName} house={house} />;
-            default: return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} /> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
+            case View.Test: return <Test theme={theme} userName={userName} house={house} addRewards={addRewards} />;
+            default: return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards}/> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };
 
@@ -180,7 +191,7 @@ const App: React.FC = () => {
                 </svg>
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
-                <Header house={house} theme={theme} />
+                <Header house={house} theme={theme} rewards={rewards} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
                     <div key={view} className="animate-fade-in">
                         {renderView()}

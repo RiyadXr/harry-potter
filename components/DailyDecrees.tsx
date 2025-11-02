@@ -6,19 +6,26 @@ interface DailyDecreesProps {
     theme: HouseTheme;
     userName: string;
     house: House | null;
+    addRewards: (amount: number) => void;
 }
 
-const getTodayStorageKey = () => {
+const getTodayDateKey = () => {
     const today = new Date();
-    return `decrees-${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    return `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
 }
 
-const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) => {
+const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, addRewards }) => {
     const [tasks, setTasks] = useState<DailyTask[]>([]);
+    const [rewardClaimed, setRewardClaimed] = useState(false);
+
+    const dateKey = getTodayDateKey();
+    const taskStorageKey = `decrees-${dateKey}`;
+    const rewardStorageKey = `decrees-reward-${dateKey}`;
 
     useEffect(() => {
-        const storageKey = getTodayStorageKey();
-        const storedTasks = localStorage.getItem(storageKey);
+        const storedTasks = localStorage.getItem(taskStorageKey);
+        const isClaimed = localStorage.getItem(rewardStorageKey) === 'true';
+        setRewardClaimed(isClaimed);
 
         if (storedTasks) {
             try {
@@ -29,24 +36,22 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
                     throw new Error("Stored tasks are not an array");
                  }
             } catch {
-                generateNewTasks(storageKey);
+                generateNewTasks();
             }
         } else {
-            generateNewTasks(storageKey);
+            generateNewTasks();
         }
     }, []);
 
-    const generateNewTasks = (storageKey: string) => {
-        // New day, shuffle and pick 5 new random tasks
+    const generateNewTasks = () => {
         const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
         const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
 
         setTasks(newTasks);
-        localStorage.setItem(storageKey, JSON.stringify(newTasks));
+        localStorage.setItem(taskStorageKey, JSON.stringify(newTasks));
         
-        // Clean up old decree keys to prevent localStorage bloat
         Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('decrees-') && key !== storageKey) {
+            if ((key.startsWith('decrees-') && key !== taskStorageKey) || (key.startsWith('decrees-reward-') && key !== rewardStorageKey)) {
                 localStorage.removeItem(key);
             }
         });
@@ -57,10 +62,18 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house }) =
             task.id === id ? { ...task, completed: !task.completed } : task
         );
         setTasks(newTasks);
-        localStorage.setItem(getTodayStorageKey(), JSON.stringify(newTasks));
+        localStorage.setItem(taskStorageKey, JSON.stringify(newTasks));
     };
     
     const allTasksCompleted = tasks.length > 0 && tasks.every(t => t.completed);
+
+    useEffect(() => {
+        if (allTasksCompleted && !rewardClaimed) {
+            addRewards(10);
+            localStorage.setItem(rewardStorageKey, 'true');
+            setRewardClaimed(true);
+        }
+    }, [allTasksCompleted, rewardClaimed, addRewards, rewardStorageKey]);
 
     return (
         <div className={`${theme.text}`}>
