@@ -1,5 +1,5 @@
 import React from 'react';
-import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem, HouseInfo } from './types';
+import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem, HouseInfo, CharacterQuizQuestion, HarryPotterCharacter } from './types';
 
 export const HOUSE_THEMES: Record<House, HouseTheme> = {
     [House.Gryffindor]: {
@@ -215,7 +215,7 @@ export const HOUSE_DETAILS: Record<House, HouseInfo> = {
         element: "Air",
         trait: "Intelligence, creativity, learning, and wit",
         description: "Ravenclaw values intelligence, creativity, learning, and wit. Its emblematic animal is an eagle and its colours are blue and bronze. The house corresponds roughly to the element of air.",
-        students: ["Luna Lovegood", "Gilderoy Lockhart", "Filius Flitwick", "Cho Chang", "Sybill Trelawney", "Garrick Ollivander"]
+        students: ["Luna Lovegood", "Gilderoy Lockhart", "Filius Flitwick", "Cho Chang", "Sybill Trelawney", "Garrick Ollivaner"]
     },
     [House.Hufflepuff]: {
         founder: "Helga Hufflepuff",
@@ -227,3 +227,28 @@ export const HOUSE_DETAILS: Record<House, HouseInfo> = {
         students: ["Cedric Diggory", "Nymphadora Tonks", "Newt Scamander", "Pomona Sprout", "Theseus Scamander", "Hannah Abbott"]
     }
 };
+
+export const CHARACTER_QUIZ_QUESTIONS: CharacterQuizQuestion[] = [
+    { id: '1', question: "When faced with a difficult problem, you are most likely to...", options: [{ text: "Research it thoroughly in a library", trait: "wisdom" }, { text: "Face it head-on, whatever the risk", trait: "bravery" }, { text: "Find a clever, unconventional workaround", trait: "cunning" }, { text: "Rely on your friends to help you through", trait: "loyalty" }] },
+    { id: '2', question: "Which magical subject would you excel at?", options: [{ text: "Charms", trait: "creativity" }, { text: "Defence Against the Dark Arts", trait: "bravery" }, { text: "Potions", trait: "precision" }, { text: "Herbology", trait: "patience" }] },
+    { id: '3', question: "Your ideal weekend involves...", options: [{ text: "A quiet corner with a good book", trait: "introversion" }, { text: "A grand adventure with close friends", trait: "extroversion" }, { text: "Scheming your next big project or goal", trait: "ambition" }, { text: "Tending to your garden or pets", trait: "nurturing" }] },
+    { id: '4', question: "What do you value most in a person?", options: [{ text: "Intelligence", trait: "wisdom" }, { text: "Courage", trait: "bravery" }, { text: "Ambition", trait: "cunning" }, { text: "Loyalty", trait: "patience" }] },
+    { id: '5', question: "You find a lost, whimpering magical creature. You...", options: [{ text: "Observe it from a distance to learn more", trait: "curiosity" }, { text: "Try to help it directly, even if it's risky", trait: "impulsive" }, { text: "Consider how it could be useful to you", trait: "resourceful" }, { text: "Ensure it's comfortable and safe before calling for help", trait: "kindness" }] },
+    { id: '6', question: "How do you view rules and regulations?", options: [{ text: "They're often bendable for a greater good", trait: "rebellious" }, { text: "They exist for a reason and should be respected", trait: "orderly" }, { text: "They are obstacles to be cleverly overcome", trait: "cunning" }, { text: "They're important for keeping everyone safe and happy", trait: "fairness" }] },
+    { id: '7', question: "What kind of power would you desire most?", options: [{ text: "The power to know everything", trait: "knowledge" }, { text: "The power to protect your loved ones", trait: "protective" }, { text: "The power to influence others", trait: "leadership" }, { text: "The power to create and build", trait: "creativity" }] },
+    { id: '8', question: "Your Boggart, the thing you fear most, is likely to be...", options: [{ text: "Failure", trait: "perfectionism" }, { text: "Losing those you love", trait: "attachment" }, { text: "Being powerless or insignificant", trait: "ambition" }, { text: "Being seen as ordinary", trait: "uniqueness" }] },
+];
+
+export const HARRY_POTTER_CHARACTERS: HarryPotterCharacter[] = [
+    { name: "Harry Potter", house: House.Gryffindor, description: "The Boy Who Lived, known for his immense courage, strong sense of justice, and unwavering loyalty to his friends.", keyTraits: "Brave, Loyal, Impulsive, Selfless" },
+    { name: "Hermione Granger", house: House.Gryffindor, description: "The brightest witch of her age, whose intelligence and logical mind are matched only by her fierce loyalty and bravery.", keyTraits: "Intelligent, Hardworking, Logical, Brave" },
+    { name: "Ron Weasley", house: House.Gryffindor, description: "A loyal and humorous friend who, despite his insecurities, never fails to show immense courage when it matters most.", keyTraits: "Loyal, Humorous, Courageous, Strategic" },
+    { name: "Albus Dumbledore", house: House.Gryffindor, description: "The wise and powerful Headmaster of Hogwarts, known for his eccentric nature, profound wisdom, and belief in the power of love.", keyTraits: "Wise, Powerful, Eccentric, Kind" },
+    { name: "Severus Snape", house: House.Slytherin, description: "A complex and enigmatic figure, whose sarcastic exterior hides a deep capacity for bravery and love.", keyTraits: "Complex, Sarcastic, Brave, Misunderstood" },
+    { name: "Luna Lovegood", house: House.Ravenclaw, description: "A unique and dreamy individual who sees the world differently, valued for her unwavering open-mindedness and surprising wisdom.", keyTraits: "Eccentric, Open-minded, Perceptive, Serene" },
+    { name: "Neville Longbottom", house: House.Gryffindor, description: "A testament to true bravery, evolving from a shy, clumsy boy into a courageous leader who stands up for what's right.", keyTraits: "Brave, Loyal, Resilient, Humble" },
+    { name: "Draco Malfoy", house: House.Slytherin, description: "A proud and arrogant rival, who is often a product of his upbringing but shows signs of inner conflict and complexity.", keyTraits: "Arrogant, Ambitious, Conflicted, Cunning" },
+    { name: "Ginny Weasley", house: House.Gryffindor, description: "A confident, strong-willed, and powerful witch who is fiercely independent and an accomplished Quidditch player.", keyTraits: "Confident, Strong-willed, Energetic, Protective" },
+    { name: "Sirius Black", house: House.Gryffindor, description: "A daring, reckless, and fiercely loyal godfather, who loves with intensity and fights for justice.", keyTraits: "Reckless, Loyal, Daring, Protective" },
+    { name: "Remus Lupin", house: House.Gryffindor, description: "A kind, wise, and responsible teacher, who carries a heavy burden but remains compassionate and a steadying influence.", keyTraits: "Kind, Wise, Responsible, Compassionate" },
+];

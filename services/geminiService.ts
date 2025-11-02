@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { House, SortingResult, DailyProphetArticle } from '../types';
+import { House, SortingResult, DailyProphetArticle, CharacterMatchResult } from '../types';
+import { HARRY_POTTER_CHARACTERS } from "../constants";
 
 export const getSortingHatDecision = async (answers: string[], apiKey: string): Promise<SortingResult> => {
     
@@ -151,5 +152,67 @@ export const getOwlAnswer = async (question: string, apiKey: string): Promise<st
     } catch (error) {
         console.error("Error fetching owl answer from Gemini:", error);
         return "The owl returns with a ruffled feather, the message seemingly lost in a magical crosswind. Please try again.";
+    }
+};
+
+export const getCharacterMatch = async (answers: { question: string, answer: string }[], apiKey: string): Promise<CharacterMatchResult> => {
+    if (!apiKey) {
+        return {
+            characterName: "Squib",
+            reasoning: "The magical connection required for this divination is faint. The Headmaster's secret key must be provided to reveal your true magical counterpart."
+        };
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const characterNames = HARRY_POTTER_CHARACTERS.map(c => c.name);
+
+    const prompt = `You are a magical personality analyst from the wizarding world, an expert in Legilimency. Your task is to determine which Harry Potter character a user most resembles based on their answers to a personality quiz.
+
+Here is the list of possible characters you can match them with: ${characterNames.join(', ')}. You MUST choose a character's full name from this list.
+
+Here are the user's answers:
+${answers.map(a => `Q: ${a.question}\nA: ${a.answer}`).join('\n\n')}
+
+Analyze these responses deeply. Consider the traits, motivations, and underlying personality they reveal.
+
+Provide your analysis in a JSON format.`;
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        characterName: {
+                            type: Type.STRING,
+                            description: 'The full name of the matched character from the provided list.',
+                            enum: characterNames,
+                        },
+                        reasoning: {
+                            type: Type.STRING,
+                            description: "A detailed, insightful, and slightly whimsical explanation for why the user matches this character, written as if you are revealing a profound truth about their inner self."
+                        }
+                    },
+                    required: ['characterName', 'reasoning']
+                }
+            }
+        });
+        
+        const text = response.text;
+        const result = JSON.parse(text);
+
+        if (characterNames.includes(result.characterName) && typeof result.reasoning === 'string') {
+            return result as CharacterMatchResult;
+        } else {
+            console.error("Invalid character match response from Gemini:", result);
+            return { characterName: "Peeves", reasoning: "Mischief is afoot! The connection was scrambled, resulting in a chaotic and unpredictable match. Perhaps try gazing into the crystal ball again?" };
+        }
+
+    } catch (error) {
+        console.error("Error calling Gemini API for character match:", error);
+         return { characterName: "Nearly Headless Nick", reasoning: "A ghostly interference has clouded the divination. It seems the magical wires were crossed. Please try to connect with the spirits again later." };
     }
 };

@@ -76,7 +76,7 @@ export interface DailyProphetArticle {
 }
 
 export interface ShopItem {
-    id: string;
+    id:string;
     name: string;
     description: string;
     price: number;
@@ -91,4 +91,22 @@ export interface HouseInfo {
     trait: string;
     description: string;
     students: string[];
+}
+
+export interface CharacterQuizQuestion {
+    id: string;
+    question: string;
+    options: { text: string; trait: string }[];
+}
+
+export interface HarryPotterCharacter {
+    name: string;
+    house: House | 'Unknown';
+    description: string;
+    keyTraits: string;
+}
+
+export interface CharacterMatchResult {
+    characterName: string;
+    reasoning: string;
 }
