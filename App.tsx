@@ -169,8 +169,8 @@ const App: React.FC = () => {
     const renderView = () => {
         switch (view) {
             case View.Journal: return <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards} />;
-            case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} />;
-            case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} />;
+            case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} addRewards={addRewards} />;
+            case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} addRewards={addRewards} />;
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} />;
             case View.Settings: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;

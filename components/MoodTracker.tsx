@@ -6,17 +6,25 @@ interface MoodTrackerProps {
     moods: Mood[];
     setMoods: React.Dispatch<React.SetStateAction<Mood[]>>;
     theme: HouseTheme;
+    addRewards: (amount: number) => void;
 }
 
-const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme }) => {
+const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRewards }) => {
     
     const addMood = (potion: typeof POTIONS[0]) => {
         const today = new Date().toDateString();
+        const moodExistsForToday = moods.some(m => m.date === today);
+        
         const newMood: Mood = { id: Date.now(), date: today, potion: potion.name, color: potion.color };
 
         // Replace today's mood if it already exists
         const otherDaysMoods = moods.filter(m => m.date !== today);
         setMoods([newMood, ...otherDaysMoods].slice(0, 35)); // Limit to 35 entries
+
+        // Only reward if a mood for today wasn't already set
+        if (!moodExistsForToday) {
+            addRewards(1);
+        }
     };
 
     const getMoodForDate = (day: number, month: number, year: number): Mood | undefined => {

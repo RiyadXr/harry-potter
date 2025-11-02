@@ -55,7 +55,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
             const finalScore = score + (isCorrect ? 1 : 0);
             setScore(finalScore);
             if (finalScore > currentExam.questions.length / 2) {
-                addRewards(10);
+                addRewards(50);
             }
             setIsFinished(true);
         }
@@ -67,7 +67,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
 
     if (isFinished && currentExam) {
         const passed = score > currentExam.questions.length / 2;
-        const rewardMessage = `Outstanding, ${userName}! Your knowledge is truly impressive. 10 points to ${house}!`;
+        const rewardMessage = `Outstanding, ${userName}! Your knowledge is truly impressive. You've earned a magnificent 50 Galleons!`;
         const curseMessage = `Oh dear, ${userName}! You've been cursed with Babbling! Your answers were all over the place. Better hit the books!`;
 
         return (

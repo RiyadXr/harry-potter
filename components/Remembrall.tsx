@@ -6,9 +6,10 @@ interface RemembrallProps {
     setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
     theme: HouseTheme;
     userName: string;
+    addRewards: (amount: number) => void;
 }
 
-const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userName }) => {
+const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userName, addRewards }) => {
     const [newTask, setNewTask] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -24,9 +25,14 @@ const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userNam
     };
 
     const toggleTask = (id: number) => {
+        const task = tasks.find(t => t.id === id);
+        if (task && !task.completed) {
+            // Award points only when completing a task for the first time
+            addRewards(1);
+        }
         setTasks(
-            tasks.map(task =>
-                task.id === id ? { ...task, completed: !task.completed } : task
+            tasks.map(t =>
+                t.id === id ? { ...t, completed: !t.completed } : t
             )
         );
     };

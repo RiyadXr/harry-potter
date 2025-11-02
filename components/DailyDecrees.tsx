@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HouseTheme, DailyTask, House } from '../types';
 import { WIZARDING_TASKS_POOL } from '../constants';
 
@@ -22,6 +22,20 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
     const taskStorageKey = `decrees-${dateKey}`;
     const rewardStorageKey = `decrees-reward-${dateKey}`;
 
+    const generateNewTasks = useCallback(() => {
+        const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
+        const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
+
+        setTasks(newTasks);
+        localStorage.setItem(taskStorageKey, JSON.stringify(newTasks));
+        
+        Object.keys(localStorage).forEach(key => {
+            if ((key.startsWith('decrees-') && key !== taskStorageKey) || (key.startsWith('decrees-reward-') && key !== rewardStorageKey)) {
+                localStorage.removeItem(key);
+            }
+        });
+    }, [taskStorageKey, rewardStorageKey]);
+
     useEffect(() => {
         const storedTasks = localStorage.getItem(taskStorageKey);
         const isClaimed = localStorage.getItem(rewardStorageKey) === 'true';
@@ -41,21 +55,7 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
         } else {
             generateNewTasks();
         }
-    }, []);
-
-    const generateNewTasks = () => {
-        const shuffled = [...WIZARDING_TASKS_POOL].sort(() => 0.5 - Math.random());
-        const newTasks = shuffled.slice(0, 5).map(task => ({ ...task, completed: false }));
-
-        setTasks(newTasks);
-        localStorage.setItem(taskStorageKey, JSON.stringify(newTasks));
-        
-        Object.keys(localStorage).forEach(key => {
-            if ((key.startsWith('decrees-') && key !== taskStorageKey) || (key.startsWith('decrees-reward-') && key !== rewardStorageKey)) {
-                localStorage.removeItem(key);
-            }
-        });
-    };
+    }, [taskStorageKey, rewardStorageKey, generateNewTasks]);
 
     const toggleTask = (id: string) => {
         const newTasks = tasks.map(task => 
@@ -69,7 +69,7 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
 
     useEffect(() => {
         if (allTasksCompleted && !rewardClaimed) {
-            addRewards(10);
+            addRewards(25);
             localStorage.setItem(rewardStorageKey, 'true');
             setRewardClaimed(true);
         }
@@ -113,7 +113,7 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
 
             {allTasksCompleted && (
                  <div className="mt-8 text-center p-4 rounded-lg bg-yellow-500/20 animate-fade-in-up">
-                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! Ten points to {house || 'your House'}!</p>
+                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! You've earned 25 Galleons for your diligence!</p>
                  </div>
             )}
         </div>
