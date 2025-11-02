@@ -136,8 +136,53 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [score, setScore] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
+    const [examCooldownEndTime, setExamCooldownEndTime] = useState<number | null>(null);
+    const [timeLeft, setTimeLeft] = useState('');
+
+    // Load and manage cooldown timer
+    useEffect(() => {
+        const storedCooldownEnd = localStorage.getItem('examCooldownEndTime');
+        if (storedCooldownEnd) {
+            const endTime = parseInt(storedCooldownEnd, 10);
+            if (endTime > Date.now()) {
+                setExamCooldownEndTime(endTime);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!examCooldownEndTime) return;
+
+        const timer = setInterval(() => {
+            const now = Date.now();
+            const remaining = examCooldownEndTime - now;
+
+            if (remaining <= 0) {
+                clearInterval(timer);
+                setTimeLeft('');
+                setExamCooldownEndTime(null);
+                localStorage.removeItem('examCooldownEndTime');
+            } else {
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                setTimeLeft(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [examCooldownEndTime]);
+
+    const startCooldown = () => {
+        const twoHours = 2 * 60 * 60 * 1000;
+        const endTime = Date.now() + twoHours;
+        localStorage.setItem('examCooldownEndTime', String(endTime));
+        setExamCooldownEndTime(endTime);
+    };
 
     const handleBeginExam = () => {
+        if (examCooldownEndTime && examCooldownEndTime > Date.now()) return;
+
         const randomTitle = EXAM_TITLES[Math.floor(Math.random() * EXAM_TITLES.length)];
         const shuffledQuestions = [...ALL_EXAM_QUESTIONS].sort(() => 0.5 - Math.random());
         const selectedQuestions = shuffledQuestions.slice(0, 5);
@@ -161,11 +206,12 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
             setSelectedAnswer(null);
             setQuestionIndex(prevIndex => prevIndex + 1);
         } else {
-            const finalScore = score + (isCorrect && questionIndex === score ? 1 : 0);
-            if (finalScore > currentExam.questions.length / 2) {
+            const finalScore = score + (isCorrect ? 1 : 0);
+             if (finalScore > currentExam.questions.length / 2) {
                 addRewards(50);
             }
             setIsFinished(true);
+            startCooldown();
         }
     };
 
@@ -233,16 +279,23 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
     }
 
     // Main menu view
+    const isExamOnCooldown = !!timeLeft;
     return (
         <div className={`${theme.text} text-center`}>
             <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>Divination & Examinations</h2>
             <p className="mb-6">Test your knowledge in the Examination Hall or discover your magical counterpart through Divination.</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                 <button onClick={handleBeginExam} className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-all-smooth ${theme.primary} w-full sm:w-52`}>
+                 <button 
+                    onClick={handleBeginExam} 
+                    disabled={isExamOnCooldown}
+                    className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transition-all-smooth ${isExamOnCooldown ? 'bg-gray-700/50 cursor-not-allowed' : `${theme.primary} transform hover:scale-105`} w-full sm:w-52 h-40`}
+                >
                     <span className="text-5xl mb-3">📜</span>
-                    <h3 className="font-magic text-xl">Examination Hall</h3>
+                    <h3 className="font-magic text-xl">
+                        {isExamOnCooldown ? timeLeft : 'Examination Hall'}
+                    </h3>
                 </button>
-                <button onClick={() => setTestView('character')} className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-all-smooth ${theme.primary} w-full sm:w-52`}>
+                <button onClick={() => setTestView('character')} className={`p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-center transform hover:scale-105 transition-all-smooth ${theme.primary} w-full sm:w-52 h-40`}>
                     <span className="text-5xl mb-3">✨</span>
                     <h3 className="font-magic text-xl">Character Divination</h3>
                 </button>
