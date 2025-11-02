@@ -44,6 +44,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
     const [feedback, setFeedback] = useState('');
     const [isLetterOpen, setIsLetterOpen] = useState(false);
     const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
+    const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
     const currentQuestion = useMemo(() => {
         return TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)];
@@ -160,6 +161,16 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                 </div>
             </div>
 
+            <div className="text-center mt-8">
+                <button
+                    onClick={() => setIsInfoModalOpen(true)}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${theme.primary} ${theme.text} opacity-50 hover:opacity-100 transition-opacity duration-300 font-serif italic text-lg`}
+                    aria-label="Show credits"
+                >
+                    i
+                </button>
+            </div>
+
             {isLetterOpen && (
                  <Modal title="A Letter for Onamika" onClose={() => setIsLetterOpen(false)} theme={theme} footerButtonText="Close">
                     <div className="relative">
@@ -231,6 +242,19 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                             </p>
                         )}
                     </form>
+                </Modal>
+            )}
+
+            {isInfoModalOpen && (
+                <Modal
+                    title="A Secret Note"
+                    onClose={() => setIsInfoModalOpen(false)}
+                    theme={theme}
+                    footerButtonText="❤️"
+                >
+                    <p className="text-center text-xl italic p-4">
+                        Made only for you by Riyad &lt;3
+                    </p>
                 </Modal>
             )}
         </div>
