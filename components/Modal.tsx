@@ -1,6 +1,4 @@
-
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HouseTheme } from '../types';
 
 interface ModalProps {
@@ -13,8 +11,32 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ title, onClose, theme, children, showFooterButton = true, footerButtonText }) => {
+    
+    useEffect(() => {
+        // Use a global counter to handle nested or sequential modals correctly.
+        const globalWindow = window as any;
+        globalWindow.activeModals = (globalWindow.activeModals || 0) + 1;
+        
+        // Find the footer and make it invisible.
+        const footer = document.querySelector('footer');
+        if (footer) {
+            footer.classList.add('invisible');
+        }
+
+        return () => {
+            globalWindow.activeModals--;
+            // Only make the footer visible again if no other modals are open.
+            if (globalWindow.activeModals === 0) {
+                 const footerOnCleanup = document.querySelector('footer');
+                 if (footerOnCleanup) {
+                    footerOnCleanup.classList.remove('invisible');
+                 }
+            }
+        };
+    }, []);
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black flex items-center justify-center z-50 p-4 animate-fade-in">
             <div className={`relative p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md border-4 ${theme.border} ${theme.secondary} ${theme.text} animate-fade-in-up`}>
                 <button
                     onClick={onClose}
