@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import Journal from './components/Journal';
@@ -41,45 +41,7 @@ const App: React.FC = () => {
     // House Details Modal state
     const [isHouseModalOpen, setIsHouseModalOpen] = useState(false);
 
-    // Background Music State
-    const [isMuted, setIsMuted] = useState(true);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
     const userName = "Onamika";
-
-    // Music setup and first interaction handler
-    useEffect(() => {
-        const audioElement = document.getElementById('background-music') as HTMLAudioElement;
-        if (audioElement) {
-            audioRef.current = audioElement;
-            const storedMutePref = localStorage.getItem('musicMuted');
-            // Default to unmuted if no preference is stored, otherwise respect stored preference
-            const initialMuteState = storedMutePref === null ? false : storedMutePref === 'true';
-
-            setIsMuted(initialMuteState);
-            audioElement.muted = initialMuteState;
-            audioElement.volume = 0.2; // Set a pleasant volume
-
-            const playMusicOnInteraction = () => {
-                if (audioElement.paused) {
-                    audioElement.play().catch(error => {
-                        console.info("Background music playback requires user interaction.");
-                    });
-                }
-                // Clean up the listener after the first interaction
-                window.removeEventListener('click', playMusicOnInteraction, true);
-                window.removeEventListener('keydown', playMusicOnInteraction, true);
-            };
-
-            window.addEventListener('click', playMusicOnInteraction, true);
-            window.addEventListener('keydown', playMusicOnInteraction, true);
-
-            return () => {
-                window.removeEventListener('click', playMusicOnInteraction, true);
-                window.removeEventListener('keydown', playMusicOnInteraction, true);
-            };
-        }
-    }, []);
 
     // Load all data from local storage on initial render
     useEffect(() => {
@@ -228,25 +190,6 @@ const App: React.FC = () => {
         }
     };
 
-    const toggleMute = () => {
-        if (audioRef.current) {
-            const newMutedState = !isMuted;
-            setIsMuted(newMutedState);
-            audioRef.current.muted = newMutedState;
-            localStorage.setItem('musicMuted', String(newMutedState));
-
-            // If un-muting, also try to play the audio.
-            // This handles the case where the user's first action is to unmute.
-            if (!newMutedState && audioRef.current.paused) {
-                audioRef.current.play().catch(error => {
-                    // This is expected if the user hasn't interacted with the page yet.
-                    // The general interaction listener will handle it.
-                    console.info("Background music playback requires user interaction.");
-                });
-            }
-        }
-    };
-
     if(isLoading) {
         return <LoadingScreen userName={userName} />;
     }
@@ -277,15 +220,7 @@ const App: React.FC = () => {
                 </svg>
             </button>
             <div className="p-4 pb-28 sm:max-w-4xl sm:mx-auto">
-                <Header 
-                    house={house} 
-                    theme={theme} 
-                    rewards={rewards} 
-                    setView={handleSetView} 
-                    onCrestClick={() => setIsHouseModalOpen(true)}
-                    isMuted={isMuted}
-                    toggleMute={toggleMute}
-                />
+                <Header house={house} theme={theme} rewards={rewards} setView={handleSetView} onCrestClick={() => setIsHouseModalOpen(true)} />
                 <main className={`mt-4 p-4 sm:p-6 rounded-lg shadow-2xl transition-all-smooth ${theme.secondary} ${theme.border} border-2`}>
                     <div key={view} className="animate-fade-in">
                         {renderView()}
