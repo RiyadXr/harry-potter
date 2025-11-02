@@ -164,7 +164,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
             <div className="text-center mt-8">
                 <button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${theme.primary} ${theme.text} opacity-50 hover:opacity-100 transition-opacity duration-300 font-serif italic text-lg`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${theme.primary} ${theme.text} font-serif italic text-lg animate-magical-glow transition-transform duration-300 hover:scale-110`}
                     aria-label="Show credits"
                 >
                     i

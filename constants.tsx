@@ -52,15 +52,15 @@ export const WIZARDING_FACTS: string[] = [
     "A Patronus is a projection of one's most positive feelings and takes the form of an animal unique to each individual.",
 ];
 
-export const POTIONS: { name: string, color: string }[] = [
-    { name: 'Felix Felicis', color: 'bg-yellow-400' },
-    { name: 'Amortentia', color: 'bg-pink-400' },
-    { name: 'Polyjuice Potion', color: 'bg-green-400' },
-    { name: 'Draught of Living Death', color: 'bg-purple-400' },
-    { name: 'Veritaserum', color: 'bg-blue-300' },
-    { name: 'Calming Draught', color: 'bg-teal-300' },
-    { name: 'Skele-Gro', color: 'bg-white' },
-    { name: 'Wolfsbane Potion', color: 'bg-gray-400' },
+export const POTIONS: { name: string, color: string, description: string }[] = [
+    { name: 'Felix Felicis', color: 'bg-yellow-400', description: "Liquid Luck. A single sip will make you successful in all your endeavours for a short period. Use sparingly!" },
+    { name: 'Amortentia', color: 'bg-pink-400', description: "The most powerful love potion in the world. It causes a powerful infatuation or obsession from the drinker." },
+    { name: 'Polyjuice Potion', color: 'bg-green-400', description: "A complex potion that allows the drinker to assume the form of someone else." },
+    { name: 'Draught of Living Death', color: 'bg-purple-400', description: "A powerful sleeping potion that sends the drinker into a death-like slumber." },
+    { name: 'Veritaserum', color: 'bg-blue-300', description: "A powerful truth serum that forces the drinker to answer any questions truthfully." },
+    { name: 'Calming Draught', color: 'bg-teal-300', description: "Used to calm a person down after they have suffered a shock, trauma, or emotional outburst." },
+    { name: 'Skele-Gro', color: 'bg-white', description: "A dreadful-tasting potion that regrows missing or removed bones. The process is slow and painful." },
+    { name: 'Wolfsbane Potion', color: 'bg-gray-400', description: "An innovative potion that relieves the symptoms of lycanthropy, allowing a werewolf to keep their human mind." },
 ];
 
 export const ICONS = {
@@ -177,8 +177,8 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     },
     {
         question: "Who is the Transfiguration professor and Head of Gryffindor?",
-        options: ["Severus Snape", "Filius Flitwick", "Pomona Sprout", "Minerva McGonagall"],
-        correctAnswer: "Minerva McGonagall"
+        options: ["Severus Snape", "Filius Flitwick", "Pomona Sprout", "Minerva McGonall"],
+        correctAnswer: "Minerva McGonall"
     },
     {
         question: "What is the function of a Remembrall?",
@@ -257,7 +257,7 @@ export const HOUSE_DETAILS: Record<House, HouseInfo> = {
         element: "Fire",
         trait: "Courage, bravery, nerve, and chivalry",
         description: "Gryffindor values bravery, daring, nerve, and chivalry. Its emblematic animal is the lion and its colours are scarlet and gold. The house corresponds roughly to the element of fire.",
-        students: ["Harry Potter", "Hermione Granger", "Ron Weasley", "Albus Dumbledore", "Minerva McGonagall", "Neville Longbottom"]
+        students: ["Harry Potter", "Hermione Granger", "Ron Weasley", "Albus Dumbledore", "Minerva McGonall", "Neville Longbottom"]
     },
     [House.Slytherin]: {
         founder: "Salazar Slytherin",

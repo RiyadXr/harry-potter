@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mood, HouseTheme } from '../types';
 import { POTIONS } from '../constants';
+import Modal from './Modal';
 
 interface MoodTrackerProps {
     moods: Mood[];
@@ -10,6 +11,15 @@ interface MoodTrackerProps {
 }
 
 const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRewards }) => {
+    const [selectedPotion, setSelectedPotion] = useState<(typeof POTIONS)[0] | null>(null);
+
+    const handlePotionClick = (potion: typeof POTIONS[0]) => {
+        setSelectedPotion(potion);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedPotion(null);
+    };
     
     const addMood = (potion: typeof POTIONS[0]) => {
         const today = new Date().toDateString();
@@ -24,6 +34,13 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRe
         // Only reward if a mood for today wasn't already set
         if (!moodExistsForToday) {
             addRewards(1);
+        }
+    };
+
+    const handleConfirmAddMood = () => {
+        if (selectedPotion) {
+            addMood(selectedPotion);
+            handleCloseModal();
         }
     };
 
@@ -65,7 +82,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRe
                 {POTIONS.map(potion => (
                     <button
                         key={potion.name}
-                        onClick={() => addMood(potion)}
+                        onClick={() => handlePotionClick(potion)}
                         className={`p-2 rounded-lg shadow-lg flex flex-col items-center justify-center transform hover:scale-105 transition-all-smooth ${potion.color}`}
                     >
                         <span className="text-2xl sm:text-4xl">🧪</span>
@@ -79,6 +96,33 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRe
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <div key={day} className="font-bold text-xs">{day}</div>)}
                 {renderCalendar()}
             </div>
+
+            {selectedPotion && (
+                <Modal
+                    title={selectedPotion.name}
+                    onClose={handleCloseModal}
+                    theme={theme}
+                    showFooterButton={false}
+                >
+                    <div>
+                        <p className="mb-6 text-center italic">{selectedPotion.description}</p>
+                        <div className="flex justify-center items-center space-x-4">
+                            <button
+                                onClick={handleCloseModal}
+                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.secondary} ${theme.text} font-magic`}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmAddMood}
+                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
+                            >
+                                Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 };
