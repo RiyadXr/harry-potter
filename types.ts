@@ -14,6 +14,7 @@ export enum View {
     Sorting = 'Sorting',
     Test = 'Test',
     Shop = 'Shop',
+    Menagerie = 'Menagerie',
 }
 
 export interface JournalEntry {
@@ -116,4 +117,50 @@ export interface FloatingReward {
     y: number;
     reward: 50 | 100;
     icon: string;
+}
+
+// --- Menagerie Types ---
+export enum CreatureType {
+    Niffler = 'Niffler',
+    Bowtruckle = 'Bowtruckle',
+    PygmyPuff = 'PygmyPuff',
+}
+
+export interface MagicalCreature {
+    id: CreatureType;
+    name: string;
+    description: string;
+    personality: string;
+    image: string;
+}
+
+export interface CreatureState {
+    id: CreatureType;
+    name: string;
+    energy: number; // 0-100
+    lastFed: string;
+    lastPlayed: string;
+}
+
+export interface FoodItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    icon: string;
+    energyBoost: number;
+    forCreature: CreatureType[];
+}
+
+export interface PetChatMessage {
+    role: 'user' | 'model';
+    content: string;
+}
+
+export interface PetQuizQuestion {
+    question: string;
+    options: {
+        text: string;
+        value: 'shiny' | 'loyal' | 'cuddly';
+    }[];
 }

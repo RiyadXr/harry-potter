@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { HouseTheme, House, View, ShopItem } from '../types';
-import { TRIVIA_QUESTIONS, ICONS, SHOP_ITEMS } from '../constants';
+import { HouseTheme, House, View, ShopItem, CreatureType } from '../types';
+import { TRIVIA_QUESTIONS, ICONS, SHOP_ITEMS, CREATURES, PET_QUIZ_QUESTIONS } from '../constants';
 import Modal from './Modal';
 import { getAnimationForItem } from '../utils/animations';
+import { getPetMatch } from '../services/geminiService';
 
 interface SettingsProps {
     theme: HouseTheme;
@@ -10,6 +11,10 @@ interface SettingsProps {
     setView: (view: View) => void;
     onLeaveHouse: () => void;
     purchasedItems: Record<string, number>;
+    adoptedCreature: any; // Using 'any' to avoid breaking changes if type is not available
+    onAdoptCreature: (creatureId: CreatureType) => void;
+    showWiseOwl: boolean;
+    setShowWiseOwl: (show: boolean) => void;
 }
 
 const Sparkles: React.FC = () => {
@@ -37,14 +42,101 @@ const Sparkles: React.FC = () => {
     );
 };
 
+// --- Pet Quiz Modal Component ---
+interface PetQuizModalProps {
+    theme: HouseTheme;
+    onClose: () => void;
+    onAdopt: (creatureId: CreatureType) => void;
+}
 
-const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchasedItems }) => {
+const PetQuizModal: React.FC<PetQuizModalProps> = ({ theme, onClose, onAdopt }) => {
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [answers, setAnswers] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [result, setResult] = useState<{ creature: CreatureType, reasoning: string } | null>(null);
+    
+    const handleAnswer = async (value: string) => {
+        const newAnswers = [...answers, value];
+        setAnswers(newAnswers);
+
+        if (currentQuestion < PET_QUIZ_QUESTIONS.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
+        } else {
+            setIsLoading(true);
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if(!apiKey) { 
+                setResult({ creature: CreatureType.PygmyPuff, reasoning: "The Room of Requirement's magic is faint without the Headmaster's key, but it has provided a simple, cuddly friend for you." });
+            } else {
+                const decision = await getPetMatch(newAnswers, apiKey);
+                setResult(decision);
+            }
+            setIsLoading(false);
+        }
+    };
+
+    const handleConfirmAdoption = () => {
+        if (result) {
+            onAdopt(result.creature);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <Modal title="The Room is Deciding..." onClose={onClose} theme={theme} showFooterButton={false}>
+                <div className="text-center p-8 flex flex-col items-center justify-center space-y-6 min-h-[200px]">
+                    <div className={`animate-spin-slow animate-magical-glow ${theme.accent} text-2xl`}>✨</div>
+                    <p className={`${theme.text}`}>A companion is materializing...</p>
+                </div>
+            </Modal>
+        );
+    }
+
+    if (result) {
+        const creatureDetails = CREATURES.find(c => c.id === result.creature);
+        return (
+            <Modal title="A Companion Appears!" onClose={onClose} theme={theme} showFooterButton={false}>
+                <div className="text-center">
+                    <img src={creatureDetails?.image} alt={creatureDetails?.name} className="w-40 h-40 object-contain rounded-full mx-auto mb-4" />
+                    <h3 className={`text-5xl font-magic ${theme.accent} mb-4`}>{creatureDetails?.name}!</h3>
+                    <p className={`${theme.text} mb-6`}>{result.reasoning}</p>
+                    <button onClick={handleConfirmAdoption} className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
+                        Welcome them!
+                    </button>
+                </div>
+            </Modal>
+        );
+    }
+    
+    const question = PET_QUIZ_QUESTIONS[currentQuestion];
+    return (
+        <Modal title="Choose a Companion" onClose={onClose} theme={theme} showFooterButton={false}>
+            <div key={currentQuestion} className={`p-4 rounded-lg bg-black bg-opacity-10 animate-fade-in`}>
+                <h3 className="text-xl mb-6">{question.question}</h3>
+                <div className="grid grid-cols-1 gap-4">
+                    {question.options.map(option => (
+                        <button
+                            key={option.value}
+                            onClick={() => handleAnswer(option.value)}
+                            className={`p-4 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text}`}
+                        >
+                            {option.text}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
+
+const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchasedItems, adoptedCreature, onAdoptCreature, showWiseOwl, setShowWiseOwl }) => {
     const [isTriviaModalOpen, setIsTriviaModalOpen] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState('');
     const [isLetterOpen, setIsLetterOpen] = useState(false);
     const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
     const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+    const [isPetQuizOpen, setIsPetQuizOpen] = useState(false);
 
     const currentQuestion = useMemo(() => {
         return TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)];
@@ -116,6 +208,18 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                 </div>
 
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
+                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>{adoptedCreature ? 'Find a New Companion' : 'Adopt a Magical Creature'}</h3>
+                    <p className="mb-3">{adoptedCreature ? 'Perhaps another creature is calling to you?' : 'The Room has provided a path to the Menagerie. Answer its call to find a companion!'}</p>
+                    <button 
+                        onClick={() => setIsPetQuizOpen(true)}
+                        className={`px-4 py-2 rounded-lg shadow-md transition-all-smooth ${theme.primary} hover:opacity-80 flex items-center space-x-2`}
+                    >
+                        <span>{adoptedCreature ? 'Start the Search' : 'Begin the Quiz'}</span>
+                        <span>🐾</span>
+                    </button>
+                </div>
+
+                <div className="p-4 rounded-lg bg-black bg-opacity-10">
                     <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Trophy Room</h3>
                     {userTrophies.length === 0 ? (
                         <p className="opacity-75">Your collection is empty. Visit the Diagon Alley Emporium by tapping your Galleons in the header!</p>
@@ -148,6 +252,17 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                 </div>
 
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
+                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Magical Preferences</h3>
+                    <div className="flex items-center justify-between">
+                        <p className="pr-4">Show the Wise Owl for questions.</p>
+                        <label className="switch">
+                            <input type="checkbox" checked={showWiseOwl} onChange={() => setShowWiseOwl(!showWiseOwl)} />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-black bg-opacity-10">
                     <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Re-Sorting Ceremony</h3>
                     <p className="mb-3">To leave your house, you must first prove your knowledge. Answer the question correctly to proceed.</p>
                     <button 
@@ -164,7 +279,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
             <div className="text-center mt-8">
                 <button
                     onClick={() => setIsInfoModalOpen(true)}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${theme.primary} ${theme.text} font-serif italic text-lg animate-magical-glow transition-transform duration-300 hover:scale-110`}
+                    className={`mx-auto w-8 h-8 rounded-full flex items-center justify-center ${theme.primary} ${theme.text} font-serif italic text-lg animate-magical-glow transition-transform duration-300 hover:scale-110`}
                     aria-label="Show credits"
                 >
                     i
@@ -243,6 +358,14 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                         )}
                     </form>
                 </Modal>
+            )}
+
+             {isPetQuizOpen && (
+                <PetQuizModal 
+                    theme={theme}
+                    onClose={() => setIsPetQuizOpen(false)}
+                    onAdopt={onAdoptCreature}
+                />
             )}
 
             {isInfoModalOpen && (

@@ -1,6 +1,6 @@
-import { GoogleGenAI, Type } from "@google/genai";
-import { House, SortingResult, DailyProphetArticle, CharacterMatchResult } from '../types';
-import { HARRY_POTTER_CHARACTERS } from "../constants";
+import { GoogleGenAI, Type, Content } from "@google/genai";
+import { House, SortingResult, DailyProphetArticle, CharacterMatchResult, MagicalCreature, PetChatMessage, CreatureType } from '../types';
+import { HARRY_POTTER_CHARACTERS, CREATURES } from "../constants";
 
 export const getSortingHatDecision = async (answers: string[], apiKey: string): Promise<SortingResult> => {
     
@@ -237,5 +237,120 @@ export const generateRewardMessage = async (rewardAmount: number, userName: stri
     } catch (error) {
         console.error("Error generating reward message from Gemini:", error);
         return "It seems you've found a bit of wandering magic! Well done.";
+    }
+};
+
+export const getPetMatch = async (answers: string[], apiKey: string): Promise<{ creature: CreatureType, reasoning: string }> => {
+    if (!apiKey) {
+        // This should not happen if called correctly, but as a fallback
+        return {
+            creature: CreatureType.PygmyPuff,
+            reasoning: "The Room of Requirement is a bit foggy today, but it senses a desire for a simple, cuddly friend. So, a Pygmy Puff appears!"
+        };
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const creatureDescriptions = CREATURES.map(c => `- ${c.name} (${c.id}): ${c.description}`).join('\n');
+
+    const prompt = `You are the Room of Requirement, providing a student named Onamika with a magical companion. Based on her answers to a few questions, you must decide which creature is the best fit for her. The answers correspond to these traits: 'shiny' (for a Niffler), 'loyal' (for a Bowtruckle), or 'cuddly' (for a Pygmy Puff).
+
+The available creatures are:
+${creatureDescriptions}
+
+The student's answers revealed these traits: ${answers.join(', ')}.
+
+Analyze these traits and choose the most suitable creature companion. Provide your decision and a short, magical reasoning for your choice, as the Room of Requirement would.
+Return the response in JSON format.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        creature: {
+                            type: Type.STRING,
+                            description: 'The creature type.',
+                            enum: [CreatureType.Niffler, CreatureType.Bowtruckle, CreatureType.PygmyPuff]
+                        },
+                        reasoning: {
+                            type: Type.STRING,
+                            description: 'The reasoning for the choice, as if spoken by the Room of Requirement.'
+                        }
+                    },
+                    required: ['creature', 'reasoning']
+                }
+            }
+        });
+
+        const text = response.text;
+        const result = JSON.parse(text);
+
+        if (Object.values(CreatureType).includes(result.creature) && typeof result.reasoning === 'string') {
+            return result as { creature: CreatureType, reasoning: string };
+        } else {
+            throw new Error("Invalid response format from Gemini");
+        }
+    } catch (error) {
+        console.error("Error calling Gemini API for pet match:", error);
+        // Fallback logic
+        const counts: Record<string, number> = { shiny: 0, loyal: 0, cuddly: 0 };
+        answers.forEach(ans => {
+            if(ans in counts) (counts as any)[ans]++;
+        });
+        const majorityTrait = Object.keys(counts).reduce((a, b) => (counts as any)[a] > (counts as any)[b] ? a : b);
+        let creature: CreatureType;
+        if (majorityTrait === 'shiny') creature = CreatureType.Niffler;
+        else if (majorityTrait === 'loyal') creature = CreatureType.Bowtruckle;
+        else creature = CreatureType.PygmyPuff;
+
+        return {
+            creature,
+            reasoning: "The magical connection fizzled, but the Room sensed your heart's desire and provided a suitable companion."
+        };
+    }
+};
+
+export const getPetResponse = async (
+    creature: MagicalCreature, 
+    userMessage: string, 
+    chatHistory: PetChatMessage[], 
+    apiKey: string
+): Promise<string> => {
+    if (!apiKey) {
+        return "The creature looks at you, but seems unable to understand, as if the magical connection is weak."
+    }
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const contents: Content[] = [
+        ...chatHistory.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.content }]
+        })),
+        {
+            role: 'user',
+            parts: [{ text: userMessage }]
+        }
+    ];
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: contents,
+            config: {
+                systemInstruction: creature.personality,
+                maxOutputTokens: 100,
+                temperature: 0.9,
+            }
+        });
+        const text = response.text;
+        return text ? text.trim() : "*The creature stares blankly for a moment, as if lost in thought.*";
+    } catch (error) {
+        console.error("Error fetching pet response from Gemini:", error);
+        return "*The creature makes a confused noise, the magic seems to have fizzled out.*";
     }
 };

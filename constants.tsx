@@ -1,5 +1,5 @@
 import React from 'react';
-import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem, HouseInfo, CharacterQuizQuestion, HarryPotterCharacter } from './types';
+import { House, HouseTheme, TriviaQuestion, DailyTask, ShopItem, HouseInfo, CharacterQuizQuestion, HarryPotterCharacter, MagicalCreature, CreatureType, FoodItem, PetQuizQuestion } from './types';
 
 export const HOUSE_THEMES: Record<House, HouseTheme> = {
     [House.Gryffindor]: {
@@ -311,4 +311,66 @@ export const HARRY_POTTER_CHARACTERS: HarryPotterCharacter[] = [
     { name: "Ginny Weasley", house: House.Gryffindor, description: "A confident, strong-willed, and powerful witch who is fiercely independent and an accomplished Quidditch player.", keyTraits: "Confident, Strong-willed, Energetic, Protective" },
     { name: "Sirius Black", house: House.Gryffindor, description: "A daring, reckless, and fiercely loyal godfather, who loves with intensity and fights for justice.", keyTraits: "Reckless, Loyal, Daring, Protective" },
     { name: "Remus Lupin", house: House.Gryffindor, description: "A kind, wise, and responsible teacher, who carries a heavy burden but remains compassionate and a steadying influence.", keyTraits: "Kind, Wise, Responsible, Compassionate" },
+];
+
+// --- Menagerie Constants ---
+export const CREATURES: MagicalCreature[] = [
+    {
+        id: CreatureType.Niffler,
+        name: "Niffler",
+        description: "A mischievous, long-snouted creature obsessed with anything shiny. They are gentle but can wreck havoc in their search for treasure.",
+        image: 'https://storage.googleapis.com/maker-me/uploads/2024/07/23/niffler.webp',
+        personality: "You are a Niffler. You are obsessed with shiny things, especially Galleons. You are mischievous, a bit greedy, but ultimately affectionate towards your owner, Onamika. You often refer to shiny objects in your speech. Your responses should be short, creature-like, and directly related to the conversation. Avoid long, human-like sentences."
+    },
+    {
+        id: CreatureType.Bowtruckle,
+        name: "Bowtruckle",
+        description: "A small, twig-like creature that guards wand-wood trees. They are shy and peaceful, but can become fiercely protective of their tree and friends.",
+        image: 'https://storage.googleapis.com/maker-me/uploads/2024/07/23/bowtruckle.webp',
+        personality: "You are a Bowtruckle. You are shy, loyal, and protective of your owner, Onamika. You are a being of few words, often communicating in short, simple sentences or chirps. You are wary of strangers and love woodlice. Your responses should be short, creature-like, and directly related to the conversation. Avoid long, human-like sentences."
+    },
+    {
+        id: CreatureType.PygmyPuff,
+        name: "Pygmy Puff",
+        description: "A miniature Puffskein, bred by Fred and George Weasley. They are covered in fluffy fur, roll around, and emit high-pitched squeaks.",
+        image: 'https://storage.googleapis.com/maker-me/uploads/2024/07/23/pygmypuff.webp',
+        personality: "You are a Pygmy Puff. You are adorably fluffy, energetic, and simple-minded. You love cuddles and treats. You often make squeaking or purring noises and express simple emotions like happiness and hunger. Your responses should be short, creature-like, and directly related to the conversation. Avoid long, human-like sentences."
+    }
+];
+
+export const PET_QUIZ_QUESTIONS: PetQuizQuestion[] = [
+    {
+        question: "A single, shimmering Galleon falls from a witch's pocket. You...",
+        options: [
+            { text: "Snatch it! It's so shiny!", value: 'shiny' },
+            { text: "Chirp to get her attention so she can pick it up.", value: 'loyal' },
+            { text: "Roll over it excitedly because it's pretty.", value: 'cuddly' }
+        ]
+    },
+    {
+        question: "Your ideal hiding spot is...",
+        options: [
+            { text: "Inside a velvet-lined jewelry box.", value: 'shiny' },
+            { text: "High up in the branches of a Whomping Willow.", value: 'loyal' },
+            { text: "Curled up inside your owner's pocket.", value: 'cuddly' }
+        ]
+    },
+    {
+        question: "What's the best kind of treat?",
+        options: [
+            { text: "Something sparkly I can play with first.", value: 'shiny' },
+            { text: "A crunchy woodlouse, fresh from a log.", value: 'loyal' },
+            { text: "Anything sweet that I can gobble up immediately!", value: 'cuddly' }
+        ]
+    }
+];
+
+export const FOOD_ITEMS: FoodItem[] = [
+    { id: 'shiny_coin', name: "Glimmering Coin", description: "Not real gold, but your Niffler won't know the difference. For a little while.", price: 5, icon: '🪙', energyBoost: 20, forCreature: [CreatureType.Niffler] },
+    { id: 'gold_beetle', name: "Golden Beetle", description: "A crunchy, shimmering beetle. A Niffler's favorite delicacy.", price: 15, icon: '🐞', energyBoost: 50, forCreature: [CreatureType.Niffler] },
+    { id: 'woodlice', name: "A Handful of Woodlice", description: "Wiggling and delicious. The perfect meal for a Bowtruckle.", price: 5, icon: '🐜', energyBoost: 25, forCreature: [CreatureType.Bowtruckle] },
+    { id: 'fairy_wings', name: "Crystallized Fairy Wings", description: "A sweet, crunchy treat that Bowtruckles find delightful.", price: 12, icon: '🦋', energyBoost: 40, forCreature: [CreatureType.Bowtruckle] },
+    { id: 'puff_pastry', name: "Fluffy Puff Pastry", description: "A light, airy treat that melts in a Pygmy Puff's mouth.", price: 7, icon: '🥐', energyBoost: 20, forCreature: [CreatureType.PygmyPuff] },
+    { id: 'sugar_quill_dust', name: "Sugar Quill Dust", description: "A sprinkle of pure sweetness. Pygmy Puffs go wild for it.", price: 18, icon: '✨', energyBoost: 55, forCreature: [CreatureType.PygmyPuff] },
+    { id: 'universal_treat', name: "Universal Creature Treat", description: "A simple, nutritious pellet suitable for any magical creature in a pinch.", price: 10, icon: '🥨', energyBoost: 15, forCreature: [CreatureType.Niffler, CreatureType.Bowtruckle, CreatureType.PygmyPuff] }
 ];

@@ -12,8 +12,9 @@ import Modal from './components/Modal';
 import Test from './components/Test';
 import Shop from './components/Shop';
 import HouseDetails from './components/HouseDetails';
-import { House, View, JournalEntry, Task, Mood, ShopItem, FloatingReward } from './types';
-import { HOUSE_THEMES, WIZARDING_FACTS, ICONS } from './constants';
+import Menagerie from './components/Menagerie';
+import { House, View, JournalEntry, Task, Mood, ShopItem, FloatingReward, CreatureState, CreatureType, FoodItem } from './types';
+import { HOUSE_THEMES, WIZARDING_FACTS, ICONS, CREATURES } from './constants';
 import { getOwlAnswer, generateRewardMessage } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -27,11 +28,11 @@ const App: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [footerFact, setFooterFact] = useState('');
     
-    // Floating broom state
-    const [isBroomVisible, setIsBroomVisible] = useState(false);
-    const [showFactModal, setShowFactModal] = useState(false);
-    const [currentFact, setCurrentFact] = useState('');
-    
+    // Menagerie state
+    const [adoptedCreature, setAdoptedCreature] = useState<CreatureState | null>(null);
+    const [foodInventory, setFoodInventory] = useState<Record<string, number>>({});
+    const [showWiseOwl, setShowWiseOwl] = useState(true);
+
     // Ask the Owl state
     const [isOwlModalOpen, setIsOwlModalOpen] = useState(false);
     const [owlQuestion, setOwlQuestion] = useState('');
@@ -48,9 +49,7 @@ const App: React.FC = () => {
     const [isGeneratingMessage, setIsGeneratingMessage] = useState(false);
     const [lastReward, setLastReward] = useState(0);
 
-    // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
     const rewardTimerRef = useRef<ReturnType<typeof setTimeout>>();
-    // FIX: Replaced NodeJS.Timeout with ReturnType<typeof setTimeout> for browser compatibility.
     const rewardDisappearTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
     const userName = "Onamika";
@@ -66,35 +65,29 @@ const App: React.FC = () => {
                 setView(View.Sorting);
             }
             const storedEntries = localStorage.getItem('journalEntries');
-            if (storedEntries) {
-                const parsedEntries = JSON.parse(storedEntries);
-                if (Array.isArray(parsedEntries)) setJournalEntries(parsedEntries);
-            }
+            if (storedEntries) setJournalEntries(JSON.parse(storedEntries));
+            
             const storedTasks = localStorage.getItem('remembrallTasks');
-            if (storedTasks) {
-                const parsedTasks = JSON.parse(storedTasks);
-                if (Array.isArray(parsedTasks)) setTasks(parsedTasks);
-            }
+            if (storedTasks) setTasks(JSON.parse(storedTasks));
+           
             const storedMoods = localStorage.getItem('potionMoods');
-            if (storedMoods) {
-                const parsedMoods = JSON.parse(storedMoods);
-                if(Array.isArray(parsedMoods)) setMoods(parsedMoods);
-            }
+            if (storedMoods) setMoods(JSON.parse(storedMoods));
+            
             const storedRewards = localStorage.getItem('potterJournalRewards');
-            if (storedRewards) {
-                const parsedRewards = parseInt(storedRewards, 10);
-                if (!isNaN(parsedRewards)) setRewards(parsedRewards);
-            }
+            if (storedRewards) setRewards(parseInt(storedRewards, 10));
+            
             const storedPurchasedItems = localStorage.getItem('potterJournalPurchases');
-            if (storedPurchasedItems) {
-                const parsedItems = JSON.parse(storedPurchasedItems);
-                if (Array.isArray(parsedItems)) {
-                    const newItems = parsedItems.reduce((acc, id) => ({ ...acc, [id]: 1 }), {});
-                    setPurchasedItems(newItems);
-                } else if (typeof parsedItems === 'object' && parsedItems !== null) {
-                    setPurchasedItems(parsedItems);
-                }
-            }
+            if (storedPurchasedItems) setPurchasedItems(JSON.parse(storedPurchasedItems));
+
+            const storedCreature = localStorage.getItem('adoptedCreature');
+            if (storedCreature) setAdoptedCreature(JSON.parse(storedCreature));
+
+            const storedFood = localStorage.getItem('foodInventory');
+            if (storedFood) setFoodInventory(JSON.parse(storedFood));
+
+            const storedShowOwl = localStorage.getItem('showWiseOwl');
+            setShowWiseOwl(storedShowOwl ? JSON.parse(storedShowOwl) : true);
+
         } catch (e) {
             console.error("Error hydrating app from localStorage. Resetting state.", e);
             localStorage.clear();
@@ -113,24 +106,26 @@ const App: React.FC = () => {
     useEffect(() => { if (!isLoading) localStorage.setItem('potionMoods', JSON.stringify(moods)); }, [moods, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('potterJournalRewards', rewards.toString()); }, [rewards, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('potterJournalPurchases', JSON.stringify(purchasedItems)); }, [purchasedItems, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('adoptedCreature', JSON.stringify(adoptedCreature)); }, [adoptedCreature, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('foodInventory', JSON.stringify(foodInventory)); }, [foodInventory, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('showWiseOwl', JSON.stringify(showWiseOwl)); }, [showWiseOwl, isLoading]);
     
-    // Floating broom effect
+    // Pet energy decay logic
     useEffect(() => {
-        let intervalId: ReturnType<typeof setTimeout>;
-        let timeoutId: ReturnType<typeof setTimeout>;
-        const showBroom = () => {
-            if (view !== View.Sorting && !showFactModal && !isOwlModalOpen && !isHouseModalOpen) {
-                setIsBroomVisible(true);
-                timeoutId = setTimeout(() => setIsBroomVisible(false), 15000);
-            }
-        };
-        const setRandomInterval = () => {
-            const randomDelay = Math.random() * 30000 + 30000;
-            intervalId = setTimeout(() => { showBroom(); setRandomInterval(); }, randomDelay);
-        };
-        setRandomInterval();
-        return () => { clearTimeout(intervalId); clearTimeout(timeoutId); };
-    }, [view, showFactModal, isOwlModalOpen, isHouseModalOpen]);
+        if (!adoptedCreature || isLoading) return;
+
+        const energyDecayInterval = setInterval(() => {
+            setAdoptedCreature(creature => {
+                if (!creature) return null;
+                const newEnergy = Math.max(0, creature.energy - 1);
+                if (newEnergy === creature.energy) return creature; // No change
+                return { ...creature, energy: newEnergy };
+            });
+        }, 10 * 60 * 1000); // Decrease energy every 10 minutes
+
+        return () => clearInterval(energyDecayInterval);
+    }, [adoptedCreature, isLoading]);
+
 
     const theme = useMemo(() => {
         return house ? HOUSE_THEMES[house] : {
@@ -149,13 +144,6 @@ const App: React.FC = () => {
         setHouse(null);
         localStorage.removeItem('hogwartsHouse');
         setView(View.Sorting);
-    };
-    
-    const handleBroomClick = () => {
-        const randomIndex = Math.floor(Math.random() * WIZARDING_FACTS.length);
-        setCurrentFact(WIZARDING_FACTS[randomIndex]);
-        setShowFactModal(true);
-        setIsBroomVisible(false);
     };
     
     const handleSetView = (newView: View) => {
@@ -200,6 +188,30 @@ const App: React.FC = () => {
             }));
         }
     };
+
+    const handlePurchaseFood = (item: FoodItem) => {
+        if (rewards >= item.price) {
+            setRewards(prev => prev - item.price);
+            setFoodInventory(prev => ({
+                ...prev,
+                [item.id]: (prev[item.id] || 0) + 1
+            }));
+        }
+    };
+
+    const handleAdoptCreature = (creatureId: CreatureType) => {
+        const creatureData = CREATURES.find(c => c.id === creatureId);
+        if (!creatureData) return;
+        const newCreature: CreatureState = {
+            id: creatureData.id,
+            name: creatureData.name,
+            energy: 100,
+            lastFed: new Date().toISOString(),
+            lastPlayed: new Date().toISOString(),
+        };
+        setAdoptedCreature(newCreature);
+        setView(View.Menagerie);
+    };
     
     // --- Floating Reward Logic ---
     const clearRewardTimers = () => {
@@ -227,7 +239,7 @@ const App: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const isAnyModalOpen = isRewardModalOpen || showFactModal || isOwlModalOpen || isHouseModalOpen;
+        const isAnyModalOpen = isRewardModalOpen || isOwlModalOpen || isHouseModalOpen;
         if (view !== View.Sorting && !isAnyModalOpen && !floatingReward) {
             scheduleNextReward();
         } else {
@@ -237,7 +249,7 @@ const App: React.FC = () => {
             }
         }
         return () => clearRewardTimers();
-    }, [view, isRewardModalOpen, showFactModal, isOwlModalOpen, isHouseModalOpen, floatingReward, scheduleNextReward]);
+    }, [view, isRewardModalOpen, isOwlModalOpen, isHouseModalOpen, floatingReward, scheduleNextReward]);
 
     const handleFloatingRewardClick = async (reward: FloatingReward) => {
         clearRewardTimers();
@@ -275,10 +287,17 @@ const App: React.FC = () => {
             case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} addRewards={addRewards} />;
             case View.Potions: return <MoodTracker moods={moods} setMoods={setMoods} theme={theme} addRewards={addRewards} />;
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} />;
-            case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} />;
+            case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} adoptedCreature={adoptedCreature} onAdoptCreature={handleAdoptCreature} showWiseOwl={showWiseOwl} setShowWiseOwl={setShowWiseOwl} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             case View.Test: return <Test theme={theme} userName={userName} house={house} addRewards={addRewards} />;
-            case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} />;
+            case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} foodInventory={foodInventory} onPurchaseFood={handlePurchaseFood} />;
+            case View.Menagerie: 
+                if (!adoptedCreature) {
+                    // Fallback if trying to access menagerie without a pet
+                    setView(View.Requirement);
+                    return null;
+                }
+                return <Menagerie creatureState={adoptedCreature} setCreatureState={setAdoptedCreature} foodInventory={foodInventory} setFoodInventory={setFoodInventory} theme={theme} addRewards={addRewards} userName={userName} />;
             default: return house ? <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards}/> : <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
         }
     };
@@ -297,31 +316,28 @@ const App: React.FC = () => {
                 </footer>
             </div>
             
-            {view !== View.Sorting && (
-                <>
-                    <button
-                        onClick={() => { setIsOwlModalOpen(true); setIsBroomVisible(false); }}
-                        aria-label="Ask the wise owl a question"
-                        className="fixed bottom-24 left-4 sm:left-8 z-40 p-3 bg-gray-700 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
-                    >
-                        <span className="text-3xl">{ICONS.OWL}</span>
-                    </button>
-                    {isBroomVisible && (
-                        <button
-                            onClick={handleBroomClick}
-                            aria-label="Get a wizarding world fact"
-                            className="fixed bottom-24 right-4 sm:right-8 z-40 p-3 bg-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
-                        >
-                            <span className="text-3xl">{ICONS.BROOM}</span>
-                        </button>
-                    )}
-                </>
+            {view !== View.Sorting && showWiseOwl && (
+                <button
+                    onClick={() => { setIsOwlModalOpen(true); }}
+                    aria-label="Ask the wise owl a question"
+                    className="fixed bottom-24 left-4 sm:left-8 z-40 p-2 bg-gray-700 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
+                >
+                    <span className="text-2xl">{ICONS.OWL}</span>
+                </button>
             )}
             
-            {showFactModal && (
-                <Modal title="Did you know?" onClose={() => setShowFactModal(false)} theme={theme} footerButtonText="Brilliant!">
-                    <p className="text-lg text-center">{currentFact}</p>
-                </Modal>
+            {adoptedCreature && view !== View.Sorting && (
+                <button
+                    onClick={() => setView(View.Menagerie)}
+                    aria-label={`Visit your ${adoptedCreature.name}`}
+                    className="fixed bottom-24 right-4 sm:right-8 z-40 p-1 bg-yellow-900/70 border-2 border-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
+                >
+                    <img 
+                        src={CREATURES.find(c => c.id === adoptedCreature.id)?.image} 
+                        alt={adoptedCreature.name}
+                        className="w-10 h-10 object-cover rounded-full"
+                    />
+                </button>
             )}
 
             {isOwlModalOpen && (
