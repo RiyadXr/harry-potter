@@ -348,7 +348,23 @@ export const getPetResponse = async (
             }
         });
         const text = response.text;
-        return text ? text.trim() : "*The creature stares blankly for a moment, as if lost in thought.*";
+        
+        if (text && text.trim()) {
+            return text.trim();
+        }
+
+        // Fallback for empty responses
+        switch (creature.id) {
+            case CreatureType.Niffler:
+                return "*The Niffler twitches its nose, distracted by a faint glimmer in the corner.*";
+            case CreatureType.Bowtruckle:
+                return "*The Bowtruckle makes a soft clicking sound and shuffles its twig-like feet.*";
+            case CreatureType.PygmyPuff:
+                return "*The Pygmy Puff lets out a happy squeak and rolls in a little circle.*";
+            default:
+                return "*The creature stares blankly for a moment, as if lost in thought.*";
+        }
+
     } catch (error) {
         console.error("Error fetching pet response from Gemini:", error);
         return "*The creature makes a confused noise, the magic seems to have fizzled out.*";

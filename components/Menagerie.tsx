@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { CreatureState, HouseTheme, FoodItem, PetChatMessage } from '../types';
-import { CREATURES, FOOD_ITEMS } from '../constants';
+import { CREATURES, FOOD_ITEMS, PET_ICONS } from '../constants';
 import { getPetResponse } from '../services/geminiService';
 import Modal from './Modal';
 
@@ -132,81 +132,101 @@ const Menagerie: React.FC<MenagerieProps> = ({ creatureState, setCreatureState, 
             )}
             <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>The Menagerie</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Left Panel: Pet Portrait & Actions */}
-                <div className="md:col-span-1 flex flex-col items-center p-4 rounded-lg bg-black/10">
-                    <div className={`relative w-36 h-36 rounded-full flex items-center justify-center border-4 ${theme.border} ${theme.secondary} shadow-lg overflow-hidden`}>
-                         <img src={creatureDetails.image} alt={creatureDetails.name} className="w-full h-full object-cover animate-float"/>
+            <div className={`p-2 sm:p-4 rounded-lg bg-black/10 border-2 ${theme.border} flex flex-col h-[65vh]`}>
+                {/* Pet Status Header */}
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                    <div className="flex items-center space-x-3">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${theme.border} ${theme.secondary} shadow-md`}>
+                            <span className="text-3xl">{PET_ICONS[creatureState.id]}</span>
+                        </div>
+                        <h3 className={`text-2xl font-magic ${theme.accent}`}>{creatureDetails.name}</h3>
                     </div>
-                    <h3 className={`text-4xl font-magic mt-4 ${theme.accent}`}>{creatureDetails.name}</h3>
-                    
-                    <div className="w-full mt-4">
-                        <p className="text-sm mb-1 text-center">Energy</p>
-                        <div className={`w-full bg-black/20 rounded-full h-5 border-2 ${theme.border} p-0.5`}>
+                    <div className="w-24">
+                         <div className={`w-full bg-black/20 rounded-full h-4 border ${theme.border} p-0.5`}>
                             <div 
-                                className={`h-full rounded-full transition-all duration-500 ${energyColor} flex items-center justify-center text-xs font-bold text-black/70`} 
+                                className={`h-full rounded-full transition-all duration-500 ${energyColor}`} 
                                 style={{ width: `${energyPercentage}%` }}
+                                title={`Energy: ${Math.round(energyPercentage)}%`}
                             >
-                                {Math.round(energyPercentage)}%
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex justify-around w-full mt-6">
-                        <button onClick={() => setIsFeedModalOpen(true)} className={`w-16 h-16 rounded-full shadow-md transition-all-smooth transform hover:scale-110 ${theme.primary} ${theme.text} font-magic flex flex-col items-center justify-center`}>
-                            <span className="text-2xl">🍎</span>
-                            <span className="text-xs">Feed</span>
+                {/* Chat Area */}
+                <div className="flex-grow overflow-y-auto pr-2 space-y-3 p-2 mb-2 bg-black/10 rounded-md">
+                    {chatHistory.length === 0 && (
+                        <div className="h-full flex items-center justify-center text-center opacity-60">
+                            <p>Talk to your new friend, {creatureDetails.name}!</p>
+                        </div>
+                    )}
+                    {chatHistory.map((msg, index) => (
+                        <div key={index} className={`flex items-start ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role === 'model' && (
+                                <div className={`w-8 h-8 rounded-full mr-2 flex-shrink-0 flex items-center justify-center self-end ${theme.secondary}`}>
+                                    <span className="text-lg">{PET_ICONS[creatureState.id]}</span>
+                                </div>
+                            )}
+                            <div className={`max-w-[80%] p-3 rounded-2xl ${msg.role === 'user' ? `${theme.primary} ${theme.text} rounded-br-none` : `${theme.secondary} ${theme.text} rounded-bl-none`}`}>
+                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                            </div>
+                        </div>
+                    ))}
+                    {isPetThinking && (
+                        <div className="flex items-end justify-start">
+                             <div className={`w-8 h-8 rounded-full mr-2 flex-shrink-0 flex items-center justify-center self-end ${theme.secondary}`}>
+                                <span className="text-lg">{PET_ICONS[creatureState.id]}</span>
+                             </div>
+                            <div className={`p-3 rounded-2xl rounded-bl-none ${theme.secondary} ${theme.text}`}>
+                                <div className="flex space-x-1">
+                                    <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0s' }}></span>
+                                    <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
+                                    <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={chatEndRef} />
+                </div>
+
+                {/* Action Bar */}
+                 <div className={`flex items-center justify-between mt-auto p-2 rounded-lg bg-black/10 flex-shrink-0`}>
+                    <div className="flex items-center space-x-2">
+                        <span className="text-sm font-bold opacity-80">Food:</span>
+                         {availableFood.length > 0 ? (
+                            availableFood.map(food => (
+                                <div key={food.id} className="flex items-center" title={`${food.name} (x${foodInventory[food.id]})`}>
+                                    <span className="text-xl">{food.icon}</span>
+                                    <span className="text-xs font-bold ml-1">x{foodInventory[food.id]}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <span className="text-sm opacity-60 italic">None</span>
+                        )}
+                    </div>
+                     <div className="flex items-center space-x-2">
+                        <button onClick={() => setIsFeedModalOpen(true)} title="Feed" className={`w-10 h-10 rounded-full shadow-sm transition-all-smooth transform hover:scale-110 ${theme.primary} ${theme.text} flex items-center justify-center`}>
+                            <span className="text-xl">🍎</span>
                         </button>
-                        <button onClick={handlePlay} className={`w-16 h-16 rounded-full shadow-md transition-all-smooth transform hover:scale-110 ${theme.primary} ${theme.text} font-magic flex flex-col items-center justify-center`}>
-                             <span className="text-2xl">🎾</span>
-                            <span className="text-xs">Play</span>
+                        <button onClick={handlePlay} title="Play" className={`w-10 h-10 rounded-full shadow-sm transition-all-smooth transform hover:scale-110 ${theme.primary} ${theme.text} flex items-center justify-center`}>
+                             <span className="text-xl">🎾</span>
                         </button>
                     </div>
                 </div>
 
-                {/* Right Panel: Conversation */}
-                <div className="md:col-span-2 h-[50vh] md:h-auto p-2 rounded-lg bg-black/10 border-2 ${theme.border} flex flex-col">
-                    <div className="flex-grow overflow-y-auto pr-2 space-y-3 p-2">
-                        {chatHistory.length === 0 && (
-                            <div className="h-full flex items-center justify-center text-center opacity-60">
-                                <p>Talk to your new friend, {creatureDetails.name}!</p>
-                            </div>
-                        )}
-                        {chatHistory.map((msg, index) => (
-                            <div key={index} className={`flex items-end ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                {msg.role === 'model' && <img src={creatureDetails.image} alt={creatureDetails.name} className="w-8 h-8 rounded-full mr-2 object-cover self-end" />}
-                                <div className={`max-w-[80%] p-3 rounded-2xl ${msg.role === 'user' ? `${theme.primary} ${theme.text} rounded-br-none` : `${theme.secondary} ${theme.text} rounded-bl-none`}`}>
-                                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                                </div>
-                            </div>
-                        ))}
-                        {isPetThinking && (
-                            <div className="flex items-end justify-start">
-                                 <img src={creatureDetails.image} alt={creatureDetails.name} className="w-8 h-8 rounded-full mr-2 object-cover self-end" />
-                                <div className={`p-3 rounded-2xl rounded-bl-none ${theme.secondary} ${theme.text}`}>
-                                    <div className="flex space-x-1">
-                                        <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0s' }}></span>
-                                        <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
-                                        <span className="w-2 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={chatEndRef} />
-                    </div>
-                    <form onSubmit={handleSendMessage} className="mt-2 flex space-x-2 p-1">
-                        <input
-                            type="text"
-                            value={userInput}
-                            onChange={(e) => setUserInput(e.target.value)}
-                            placeholder={`Talk to ${creatureDetails.name}...`}
-                            className={`flex-grow p-2 rounded-lg bg-transparent border-2 ${theme.border} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
-                        />
-                        <button type="submit" className={`px-4 py-2 ${theme.primary} rounded-lg shadow-md hover:scale-105 transition-all-smooth font-magic`}>
-                            Send
-                        </button>
-                    </form>
-                </div>
+                {/* Chat Input */}
+                <form onSubmit={handleSendMessage} className="mt-2 flex space-x-2 flex-shrink-0">
+                    <input
+                        type="text"
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        placeholder={`Talk to ${creatureDetails.name}...`}
+                        className={`flex-grow p-2 rounded-lg bg-transparent border-2 ${theme.border} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
+                    />
+                    <button type="submit" className={`px-4 py-2 ${theme.primary} rounded-lg shadow-md hover:scale-105 transition-all-smooth font-magic`}>
+                        Send
+                    </button>
+                </form>
             </div>
             
             {isFeedModalOpen && (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HouseTheme, ShopItem, FoodItem } from '../types';
+import { HouseTheme, ShopItem, FoodItem, CreatureState } from '../types';
 import { SHOP_ITEMS, FOOD_ITEMS } from '../constants';
 import { getAnimationForItem } from '../utils/animations';
 
@@ -10,9 +10,10 @@ interface ShopProps {
     onPurchase: (item: ShopItem) => void;
     foodInventory: Record<string, number>;
     onPurchaseFood: (item: FoodItem) => void;
+    adoptedCreature: CreatureState | null;
 }
 
-const Shop: React.FC<ShopProps> = ({ theme, rewards, purchasedItems, onPurchase, foodInventory, onPurchaseFood }) => {
+const Shop: React.FC<ShopProps> = ({ theme, rewards, purchasedItems, onPurchase, foodInventory, onPurchaseFood, adoptedCreature }) => {
     const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'artifacts' | 'feed'>('artifacts');
 
@@ -75,9 +76,28 @@ const Shop: React.FC<ShopProps> = ({ theme, rewards, purchasedItems, onPurchase,
         </div>
     );
     
-    const renderCreatureFeed = () => (
+    const renderCreatureFeed = () => {
+        if (!adoptedCreature) {
+            return (
+                <div className="text-center p-4 rounded-lg bg-black/10 animate-fade-in-up">
+                    <p className="opacity-75">You must adopt a magical creature before you can buy food. Visit the Room of Requirement!</p>
+                </div>
+            );
+        }
+    
+        const availableFoodForPet = FOOD_ITEMS.filter(item => item.forCreature.includes(adoptedCreature.id));
+    
+        if (availableFoodForPet.length === 0) {
+             return (
+                <div className="text-center p-4 rounded-lg bg-black/10 animate-fade-in-up">
+                    <p className="opacity-75">There is no special food for your {adoptedCreature.name} in stock right now.</p>
+                </div>
+            );
+        }
+
+        return (
          <div className="space-y-4">
-            {FOOD_ITEMS.map((item, index) => {
+            {availableFoodForPet.map((item, index) => {
                 const canAfford = rewards >= item.price;
                 const isDisabled = !canAfford || !!animatingItemId;
                 const count = foodInventory[item.id] || 0;
@@ -118,7 +138,8 @@ const Shop: React.FC<ShopProps> = ({ theme, rewards, purchasedItems, onPurchase,
                 );
             })}
         </div>
-    );
+        );
+    };
 
 
     return (

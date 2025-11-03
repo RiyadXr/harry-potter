@@ -131,7 +131,6 @@ export interface MagicalCreature {
     name: string;
     description: string;
     personality: string;
-    image: string;
 }
 
 export interface CreatureState {

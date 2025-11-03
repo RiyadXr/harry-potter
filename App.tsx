@@ -14,7 +14,7 @@ import Shop from './components/Shop';
 import HouseDetails from './components/HouseDetails';
 import Menagerie from './components/Menagerie';
 import { House, View, JournalEntry, Task, Mood, ShopItem, FloatingReward, CreatureState, CreatureType, FoodItem } from './types';
-import { HOUSE_THEMES, WIZARDING_FACTS, ICONS, CREATURES } from './constants';
+import { HOUSE_THEMES, WIZARDING_FACTS, ICONS, CREATURES, PET_ICONS } from './constants';
 import { getOwlAnswer, generateRewardMessage } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -290,7 +290,7 @@ const App: React.FC = () => {
             case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} adoptedCreature={adoptedCreature} onAdoptCreature={handleAdoptCreature} showWiseOwl={showWiseOwl} setShowWiseOwl={setShowWiseOwl} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             case View.Test: return <Test theme={theme} userName={userName} house={house} addRewards={addRewards} />;
-            case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} foodInventory={foodInventory} onPurchaseFood={handlePurchaseFood} />;
+            case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} foodInventory={foodInventory} onPurchaseFood={handlePurchaseFood} adoptedCreature={adoptedCreature} />;
             case View.Menagerie: 
                 if (!adoptedCreature) {
                     // Fallback if trying to access menagerie without a pet
@@ -330,13 +330,11 @@ const App: React.FC = () => {
                 <button
                     onClick={() => setView(View.Menagerie)}
                     aria-label={`Visit your ${adoptedCreature.name}`}
-                    className="fixed bottom-24 right-4 sm:right-8 z-40 p-1 bg-yellow-900/70 border-2 border-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
+                    className="fixed bottom-24 right-4 sm:right-8 z-40 w-12 h-12 flex items-center justify-center bg-yellow-900/70 border-2 border-yellow-600 rounded-full shadow-lg cursor-pointer animate-float transform hover:scale-110 transition-all-smooth"
                 >
-                    <img 
-                        src={CREATURES.find(c => c.id === adoptedCreature.id)?.image} 
-                        alt={adoptedCreature.name}
-                        className="w-10 h-10 object-cover rounded-full"
-                    />
+                    <span className="text-2xl">
+                        {PET_ICONS[adoptedCreature.id]}
+                    </span>
                 </button>
             )}
 

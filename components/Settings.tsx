@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { HouseTheme, House, View, ShopItem, CreatureType } from '../types';
-import { TRIVIA_QUESTIONS, ICONS, SHOP_ITEMS, CREATURES, PET_QUIZ_QUESTIONS } from '../constants';
+import { TRIVIA_QUESTIONS, ICONS, SHOP_ITEMS, CREATURES, PET_QUIZ_QUESTIONS, PET_ICONS } from '../constants';
 import Modal from './Modal';
 import { getAnimationForItem } from '../utils/animations';
 import { getPetMatch } from '../services/geminiService';
@@ -96,7 +96,9 @@ const PetQuizModal: React.FC<PetQuizModalProps> = ({ theme, onClose, onAdopt }) 
         return (
             <Modal title="A Companion Appears!" onClose={onClose} theme={theme} showFooterButton={false}>
                 <div className="text-center">
-                    <img src={creatureDetails?.image} alt={creatureDetails?.name} className="w-40 h-40 object-contain rounded-full mx-auto mb-4" />
+                    <div className={`w-40 h-40 rounded-full mx-auto mb-4 flex items-center justify-center ${theme.secondary}`}>
+                        <span className="text-8xl">{creatureDetails && PET_ICONS[creatureDetails.id]}</span>
+                    </div>
                     <h3 className={`text-5xl font-magic ${theme.accent} mb-4`}>{creatureDetails?.name}!</h3>
                     <p className={`${theme.text} mb-6`}>{result.reasoning}</p>
                     <button onClick={handleConfirmAdoption} className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}>
