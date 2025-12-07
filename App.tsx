@@ -311,7 +311,7 @@ const App: React.FC = () => {
                         {renderView()}
                     </div>
                 </main>
-                <footer className={`font-magic text-center mt-6 ${theme.accent} opacity-70 px-4`}>
+                <footer className="font-magic text-center mt-6 text-[#5d4037] px-4">
                     <p>"{footerFact}"</p>
                 </footer>
             </div>
