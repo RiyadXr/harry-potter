@@ -230,7 +230,7 @@ const App: React.FC = () => {
                 const newPoints = { ...prevPoints };
                 otherHouses.forEach(otherHouse => {
                     const pointsToAdd = Math.floor(Math.random() * 16) + 5; // 5 to 20 points
-                    newPoints[otherHouse] = (newPoints[otherHouse] || 0) + pointsToAdd;
+                    newPoints[otherHouse] = (Number(newPoints[otherHouse]) || 0) + pointsToAdd;
                 });
                 return newPoints;
             });
@@ -239,7 +239,7 @@ const App: React.FC = () => {
                 const newScores = { ...prevScores };
                 otherHouses.forEach(otherHouse => {
                     const scoreToAdd = Math.floor(Math.random() * 41) + 10; // 10 to 50 points
-                    newScores[otherHouse] = (newScores[otherHouse] || 0) + scoreToAdd;
+                    newScores[otherHouse] = (Number(newScores[otherHouse]) || 0) + scoreToAdd;
                 });
                 return newScores;
             });
@@ -341,7 +341,7 @@ const App: React.FC = () => {
         }
         setQuidditchScores(prev => ({
             ...prev,
-            [house]: (prev[house] || 0) + score,
+            [house]: (Number(prev[house]) || 0) + score,
         }));
         setQuidditchPlaysToday(prev => prev + 1);
     };
