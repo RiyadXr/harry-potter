@@ -53,7 +53,14 @@ const QuidditchGame: React.FC<{ onGameEnd: (score: number) => void, difficultyLe
                 vy: Math.sin(angle) * speed,
             };
         };
-        setBludgers([createBludger(1), createBludger(2)]);
+        
+        const numberOfBludgers = Math.min(5, 2 + Math.floor(difficultyLevel / 2));
+        const newBludgers = [];
+        for (let i = 0; i < numberOfBludgers; i++) {
+            newBludgers.push(createBludger(i + 1));
+        }
+        setBludgers(newBludgers);
+
     }, [difficultyLevel]);
 
     const moveSnitch = useCallback(() => {
@@ -152,6 +159,7 @@ const QuidditchGame: React.FC<{ onGameEnd: (score: number) => void, difficultyLe
     };
 
     if (gameState === 'instructions') {
+        const numberOfBludgers = Math.min(5, 2 + Math.floor(difficultyLevel / 2));
         return (
             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white font-magic z-50 text-center p-4">
                 <h2 className="text-4xl mb-4">Quidditch Rules</h2>
@@ -161,6 +169,7 @@ const QuidditchGame: React.FC<{ onGameEnd: (score: number) => void, difficultyLe
                 <div className="flex items-center justify-center space-x-4 mb-8 text-2xl text-red-400">
                     <span>Avoid the Bludgers! {ICONS.BLUDGER}</span>
                 </div>
+                {difficultyLevel > 0 && <p className="mb-4 text-lg">Watch out! There are now {numberOfBludgers} Bludgers on the pitch!</p>}
                 <button 
                     onClick={() => setGameState('countdown')}
                     className="px-8 py-4 bg-yellow-600 rounded-lg text-2xl hover:bg-yellow-500 transition-colors"
@@ -219,6 +228,8 @@ const Quidditch: React.FC<QuidditchProps> = ({ house, theme, rewards, onMatchEnd
     const [lastScore, setLastScore] = useState(0);
 
     const matchFee = quidditchPlaysToday === 0 ? 5 : 10 + Math.max(0, quidditchPlaysToday - 1) * 10;
+    const numberOfBludgers = Math.min(5, 2 + Math.floor(quidditchPlaysToday / 2));
+
 
     const handleGameEnd = (score: number) => {
         setLastScore(score);
@@ -293,7 +304,7 @@ const Quidditch: React.FC<QuidditchProps> = ({ house, theme, rewards, onMatchEnd
 
             <div className="text-center">
                  <p className="mb-2 font-magic">Daily Cup ends in: {countdown}</p>
-                 {quidditchPlaysToday > 0 && <p className="text-sm opacity-80 mb-2">Difficulty: +{quidditchPlaysToday} | Next match will be harder!</p>}
+                 {quidditchPlaysToday > 0 && <p className="text-sm opacity-80 mb-2">Difficulty: +{quidditchPlaysToday} | Next match has {numberOfBludgers} Bludgers!</p>}
                 <button
                     onClick={() => setIsPlaying(true)}
                     disabled={!canPlay}
