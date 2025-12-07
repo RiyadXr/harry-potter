@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HouseTheme, House, TriviaQuestion, CharacterQuizQuestion, CharacterMatchResult, HarryPotterCharacter } from '../types';
+import { HouseTheme, House, TriviaQuestion, CharacterQuizQuestion, CharacterMatchResult, HarryPotterCharacter, View } from '../types';
 import { ALL_EXAM_QUESTIONS, EXAM_TITLES, CHARACTER_QUIZ_QUESTIONS, HARRY_POTTER_CHARACTERS } from '../constants';
 import { getCharacterMatch } from '../services/geminiService';
 
@@ -8,6 +8,8 @@ interface TestProps {
     userName: string;
     house: House | null;
     addRewards: (amount: number) => void;
+    addHousePoints: (amount: number) => void;
+    setView: (view: View) => void;
 }
 
 interface CurrentExam {
@@ -127,7 +129,7 @@ const CharacterQuiz: React.FC<{ theme: HouseTheme, userName: string, onBack: () 
 
 
 // --- Main Test Component ---
-const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
+const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards, addHousePoints, setView }) => {
     const [testView, setTestView] = useState<'main' | 'exam' | 'character'>('main');
     
     // State for Examination Hall
@@ -209,17 +211,15 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
             const finalScore = score + (isCorrect ? 1 : 0);
              if (finalScore > currentExam.questions.length / 2) {
                 addRewards(50);
+                addHousePoints(50);
             }
             setIsFinished(true);
             startCooldown();
         }
     };
 
-    const handleBackToTestMenu = () => {
-        setCurrentExam(null);
-        setIsFinished(false);
-        setTestView('main');
-    };
+    // FIX: Define isExamOnCooldown to resolve "Cannot find name" errors.
+    const isExamOnCooldown = !!examCooldownEndTime && examCooldownEndTime > Date.now();
 
     if (testView === 'character') {
         return <CharacterQuiz theme={theme} userName={userName} onBack={() => setTestView('main')} />;
@@ -228,7 +228,7 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
     if (testView === 'exam') {
         if (isFinished && currentExam) {
             const passed = score > currentExam.questions.length / 2;
-            const rewardMessage = `Outstanding, ${userName}! Your knowledge is truly impressive. You've earned a magnificent 50 Galleons!`;
+            const rewardMessage = `Outstanding, ${userName}! Your knowledge is truly impressive. You've earned 50 Galleons and 50 points for ${house}!`;
             const curseMessage = `Oh dear, ${userName}! You've been cursed with Babbling! Your answers were all over the place. Better hit the books!`;
 
             return (
@@ -240,10 +240,10 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
                         <p>{passed ? rewardMessage : curseMessage}</p>
                     </div>
                     <button
-                        onClick={handleBackToTestMenu}
+                        onClick={() => setView(View.GreatHall)}
                         className={`mt-6 px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
                     >
-                        Back to Menu
+                        Back to Great Hall
                     </button>
                 </div>
             );
@@ -278,11 +278,11 @@ const Test: React.FC<TestProps> = ({ theme, userName, house, addRewards }) => {
         }
     }
 
-    // Main menu view
-    const isExamOnCooldown = !!timeLeft;
+    // Main menu view, which is now part of another component (GreatHall).
+    // This direct return is for when Test is rendered standalone, which it shouldn't be anymore.
     return (
         <div className={`${theme.text} text-center`}>
-            <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>Divination & Examinations</h2>
+             <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>Divination & Examinations</h2>
             <p className="mb-6">Test your knowledge in the Examination Hall or discover your magical counterpart through Divination.</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                  <button 

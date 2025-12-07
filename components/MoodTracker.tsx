@@ -1,48 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Mood, HouseTheme } from '../types';
-import { POTIONS } from '../constants';
-import Modal from './Modal';
 
-interface MoodTrackerProps {
+interface MoodCalendarProps {
     moods: Mood[];
-    setMoods: React.Dispatch<React.SetStateAction<Mood[]>>;
     theme: HouseTheme;
-    addRewards: (amount: number) => void;
 }
 
-const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRewards }) => {
-    const [selectedPotion, setSelectedPotion] = useState<(typeof POTIONS)[0] | null>(null);
-
-    const handlePotionClick = (potion: typeof POTIONS[0]) => {
-        setSelectedPotion(potion);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedPotion(null);
-    };
-    
-    const addMood = (potion: typeof POTIONS[0]) => {
-        const today = new Date().toDateString();
-        const moodExistsForToday = moods.some(m => m.date === today);
-        
-        const newMood: Mood = { id: Date.now(), date: today, potion: potion.name, color: potion.color };
-
-        // Replace today's mood if it already exists
-        const otherDaysMoods = moods.filter(m => m.date !== today);
-        setMoods([newMood, ...otherDaysMoods].slice(0, 35)); // Limit to 35 entries
-
-        // Only reward if a mood for today wasn't already set
-        if (!moodExistsForToday) {
-            addRewards(1);
-        }
-    };
-
-    const handleConfirmAddMood = () => {
-        if (selectedPotion) {
-            addMood(selectedPotion);
-            handleCloseModal();
-        }
-    };
+const MoodCalendar: React.FC<MoodCalendarProps> = ({ moods, theme }) => {
 
     const getMoodForDate = (day: number, month: number, year: number): Mood | undefined => {
         const dateStr = new Date(year, month, day).toDateString();
@@ -66,7 +30,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRe
             const isToday = day === today.getDate();
             calendarDays.push(
                 <div key={day} className={`w-full aspect-square rounded-full flex items-center justify-center text-xs border-2 transition-all-smooth ${isToday ? theme.border : 'border-transparent'} ${mood ? mood.color : theme.primary.replace('bg-','bg-opacity-20 ')}`}>
-                    {day}
+                    <span className={`${mood ? 'text-black' : 'text-current'}`}>{day}</span>
                 </div>
             );
         }
@@ -76,55 +40,13 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ moods, setMoods, theme, addRe
 
     return (
         <div className={`${theme.text}`}>
-            <h2 className={`text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}`}>Potions Class: Moods</h2>
-            <p className="mb-6 text-center">Select today's potion to record your mood.</p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 mb-8">
-                {POTIONS.map(potion => (
-                    <button
-                        key={potion.name}
-                        onClick={() => handlePotionClick(potion)}
-                        className={`p-2 rounded-lg shadow-lg flex flex-col items-center justify-center transform hover:scale-105 transition-all-smooth ${potion.color}`}
-                    >
-                        <span className="text-2xl sm:text-4xl">🧪</span>
-                        <span className="mt-2 text-center text-black font-bold font-magic text-xs sm:text-sm">{potion.name}</span>
-                    </button>
-                ))}
-            </div>
-            
-            <h3 className="text-xl sm:text-2xl font-magic mb-4 text-center">This Month's Moods</h3>
+            <p className="mb-6 text-center">Your mood potions from the last month.</p>
              <div className="grid grid-cols-7 gap-1 p-2 sm:p-4 rounded-lg bg-black bg-opacity-10 place-items-center">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <div key={day} className="font-bold text-xs">{day}</div>)}
                 {renderCalendar()}
             </div>
-
-            {selectedPotion && (
-                <Modal
-                    title={selectedPotion.name}
-                    onClose={handleCloseModal}
-                    theme={theme}
-                    showFooterButton={false}
-                >
-                    <div>
-                        <p className="mb-6 text-center italic">{selectedPotion.description}</p>
-                        <div className="flex justify-center items-center space-x-4">
-                            <button
-                                onClick={handleCloseModal}
-                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.secondary} ${theme.text} font-magic`}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleConfirmAddMood}
-                                className={`px-6 py-2 rounded-lg shadow-md transition-all-smooth transform hover:scale-105 ${theme.primary} ${theme.text} font-magic`}
-                            >
-                                Add to Calendar
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
-            )}
         </div>
     );
 };
 
-export default MoodTracker;
+export default MoodCalendar;

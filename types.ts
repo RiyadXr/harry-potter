@@ -8,13 +8,14 @@ export enum House {
 export enum View {
     Journal = 'Journal',
     Remembrall = 'Remembrall',
-    Potions = 'Potions',
+    Potions = 'Potions', // Kept for mood data, but removed from nav
     Decrees = 'Decrees',
     Requirement = 'Requirement',
     Sorting = 'Sorting',
-    Test = 'Test',
     Shop = 'Shop',
     Menagerie = 'Menagerie',
+    GreatHall = 'GreatHall',
+    Quidditch = 'Quidditch',
 }
 
 export interface JournalEntry {
@@ -163,3 +164,7 @@ export interface PetQuizQuestion {
         value: 'shiny' | 'loyal' | 'cuddly';
     }[];
 }
+
+export type HousePoints = Record<House, number>;
+
+export type QuidditchScores = Record<House, number>;

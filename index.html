@@ -104,6 +104,15 @@
         white-space: nowrap;
         border-width: 0;
       }
+      /* --- Quidditch Hit Animation --- */
+      @keyframes hit-flash {
+        0% { background-color: rgba(255, 0, 0, 0.4); }
+        100% { background-color: rgba(255, 0, 0, 0); }
+      }
+      .animate-hit {
+        animation: hit-flash 0.5s ease-out forwards;
+      }
+
 
       /* --- Item Purchase/Trophy Animations --- */
       @keyframes shimmer {

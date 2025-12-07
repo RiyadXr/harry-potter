@@ -72,6 +72,9 @@ export const ICONS = {
     OWL: <>🦉</>,
     TESTS: <>🎓</>,
     ENVELOPE: <>✉️</>,
+    SNITCH: <>🟡</>,
+    BLUDGER: <>⚫</>,
+    QUAFFLE: <>🔴</>,
 };
 
 export const SORTING_QUIZ_QUESTIONS = [
@@ -238,6 +241,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     { id: 'scarf', name: "House Scarf", description: "Show your house pride, no matter the weather.", price: 60, icon: '🧣' },
     { id: 'map', name: "Marauder's Map", description: "I solemnly swear that I am up to no good.", price: 75, icon: '🗺️' },
     { id: 'snitch', name: "Golden Snitch", description: "The most important ball of the lot. Worth 150 points.", price: 100, icon: '✨' },
+    { id: 'quidditchcup', name: "Quidditch Cup", description: "A testament to your house's aerial supremacy. Awarded for winning the Daily Quidditch Cup.", price: 0, icon: '🏆' },
     { id: 'remembrall', name: "Remembrall", description: "The smoke turns red when you've forgotten something.", price: 120, icon: '🔮' },
     { id: 'howler', name: "Howler", description: "Deliver a message with... emphasis. Best opened in private.", price: 180, icon: '🧧' },
     { id: 'timeturner', name: "Time Turner", description: "Use with caution. Three turns should do it.", price: 250, icon: '⏳' },

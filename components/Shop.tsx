@@ -33,7 +33,7 @@ const Shop: React.FC<ShopProps> = ({ theme, rewards, purchasedItems, onPurchase,
     
     const renderArtifacts = () => (
         <div className="space-y-4">
-            {SHOP_ITEMS.map((item, index) => {
+            {SHOP_ITEMS.filter(item => item.id !== 'quidditchcup').map((item, index) => {
                 const canAfford = rewards >= item.price;
                 const isDisabled = !canAfford || !!animatingItemId;
                 const count = purchasedItems[item.id] || 0;

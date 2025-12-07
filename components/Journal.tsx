@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { JournalEntry, HouseTheme, DailyProphetArticle, TriviaQuestion } from '../types';
+import { JournalEntry, HouseTheme, DailyProphetArticle, TriviaQuestion, Mood } from '../types';
 import { POTIONS, ICONS, TRIVIA_QUESTIONS } from '../constants';
 import Modal from './Modal';
+import MoodCalendar from './MoodTracker';
 import { generateDailyProphetArticle } from '../services/geminiService';
 
 interface JournalProps {
@@ -10,9 +11,12 @@ interface JournalProps {
     theme: HouseTheme;
     userName: string;
     addRewards: (amount: number) => void;
+    addHousePoints: (amount: number) => void;
+    moods: Mood[];
+    setMoods: React.Dispatch<React.SetStateAction<Mood[]>>;
 }
 
-const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName, addRewards }) => {
+const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName, addRewards, addHousePoints, moods, setMoods }) => {
     const [newEntry, setNewEntry] = useState('');
     const [mood, setMood] = useState(POTIONS[0].name);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -30,6 +34,9 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName,
     const [triviaQuestion, setTriviaQuestion] = useState<TriviaQuestion | null>(null);
     const [selectedTriviaAnswer, setSelectedTriviaAnswer] = useState<string | null>(null);
     const [triviaFeedback, setTriviaFeedback] = useState('');
+    
+    // State for mood calendar
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,8 +49,22 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName,
             mood: mood,
         };
         setEntries([entry, ...entries]);
+        
+        // Add mood entry for the calendar
+        const today = new Date().toDateString();
+        const moodExistsForToday = moods.some(m => m.date === today);
+        const selectedPotion = POTIONS.find(p => p.name === mood);
+        if (selectedPotion) {
+            const newMood: Mood = { id: Date.now(), date: today, potion: selectedPotion.name, color: selectedPotion.color };
+            const otherDaysMoods = moods.filter(m => m.date !== today);
+            setMoods([newMood, ...otherDaysMoods].slice(0, 35));
+        }
+        
         setNewEntry('');
-        addRewards(1);
+        if (!moodExistsForToday) {
+            addRewards(1);
+        }
+        addHousePoints(5);
     };
     
     const handleOpenGenerator = () => {
@@ -88,6 +109,8 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName,
             mood: mood,
         };
         setEntries([entry, ...entries]);
+        addRewards(2); // Extra reward for using generator
+        addHousePoints(5);
         handleCloseGenerator();
     };
 
@@ -165,7 +188,12 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName,
 
     return (
         <div className={`${theme.text}`}>
-            <h2 className="text-3xl font-magic mb-4 border-b-2 pb-2 ${theme.border}">Daily Prophet</h2>
+            <div className="flex justify-between items-center mb-4">
+                 <h2 className="text-3xl font-magic border-b-2 pb-2 ${theme.border}">Daily Prophet</h2>
+                 <button onClick={() => setIsCalendarOpen(true)} className={`p-2 rounded-full transition-all-smooth hover:${theme.primary}`} aria-label="View Mood Calendar">
+                    🗓️
+                 </button>
+            </div>
             <form onSubmit={handleSubmit} className={`mb-6 transition-opacity duration-300 ${isEditing ? 'opacity-50 pointer-events-none' : ''}`}>
                 <textarea
                     className={`w-full p-3 rounded-md bg-transparent border-2 ${theme.border} ${inputBg} focus:outline-none focus:ring-2 ${theme.border} transition-all-smooth`}
@@ -346,6 +374,17 @@ const Journal: React.FC<JournalProps> = ({ entries, setEntries, theme, userName,
                             </p>
                         )}
                     </form>
+                </Modal>
+            )}
+
+            {isCalendarOpen && (
+                <Modal
+                    title="Potions Class: Moods"
+                    onClose={() => setIsCalendarOpen(false)}
+                    theme={theme}
+                    footerButtonText="Close"
+                >
+                   <MoodCalendar moods={moods} theme={theme} />
                 </Modal>
             )}
         </div>

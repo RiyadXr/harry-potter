@@ -7,6 +7,7 @@ interface DailyDecreesProps {
     userName: string;
     house: House | null;
     addRewards: (amount: number) => void;
+    addHousePoints: (amount: number) => void;
 }
 
 const getTodayDateKey = () => {
@@ -14,7 +15,7 @@ const getTodayDateKey = () => {
     return `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
 }
 
-const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, addRewards }) => {
+const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, addRewards, addHousePoints }) => {
     const [tasks, setTasks] = useState<DailyTask[]>([]);
     const [rewardClaimed, setRewardClaimed] = useState(false);
 
@@ -70,10 +71,11 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
     useEffect(() => {
         if (allTasksCompleted && !rewardClaimed) {
             addRewards(25);
+            addHousePoints(25);
             localStorage.setItem(rewardStorageKey, 'true');
             setRewardClaimed(true);
         }
-    }, [allTasksCompleted, rewardClaimed, addRewards, rewardStorageKey]);
+    }, [allTasksCompleted, rewardClaimed, addRewards, addHousePoints, rewardStorageKey]);
 
     return (
         <div className={`${theme.text}`}>
@@ -113,7 +115,7 @@ const DailyDecrees: React.FC<DailyDecreesProps> = ({ theme, userName, house, add
 
             {allTasksCompleted && (
                  <div className="mt-8 text-center p-4 rounded-lg bg-yellow-500/20 animate-fade-in-up">
-                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! You've earned 25 Galleons for your diligence!</p>
+                    <p className={`text-xl font-magic ${theme.accent}`}>Excellent work, {userName}! You've earned 25 Galleons & 25 House Points!</p>
                  </div>
             )}
         </div>

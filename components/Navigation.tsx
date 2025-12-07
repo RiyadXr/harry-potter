@@ -36,9 +36,9 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, theme, ho
     const navItems = [
         { label: 'Journal', icon: '📖', view: View.Journal },
         { label: 'Remembrall', icon: '🔮', view: View.Remembrall },
-        { label: 'Potions', icon: '🧪', view: View.Potions },
+        { label: 'Quidditch', icon: ICONS.BROOM, view: View.Quidditch },
         { label: 'Decrees', icon: '📜', view: View.Decrees },
-        { label: 'Tests', icon: ICONS.TESTS, view: View.Test },
+        { label: 'Great Hall', icon: '🏆', view: View.GreatHall },
         { label: 'The Room', icon: '🗝️', view: View.Requirement },
     ];
 

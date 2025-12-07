@@ -240,6 +240,29 @@ export const generateRewardMessage = async (rewardAmount: number, userName: stri
     }
 };
 
+export const generateQuidditchCupMessage = async (userName: string, houseName: string, apiKey: string): Promise<string> => {
+    if (!apiKey) {
+        return `Congratulations, ${userName}! Your skill has brought great honour to ${houseName}. Well done on winning the Quidditch Cup!`;
+    }
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const systemInstruction = `You are Albus Dumbledore, the wise Headmaster of Hogwarts. You are writing a short, congratulatory message to a student named ${userName} whose house, ${houseName}, has just won the Daily Quidditch Cup. Your tone should be wise, inspiring, and whimsical, celebrating their house's skill and valor. Keep it to about two or three sentences.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: "Craft the message of congratulations.",
+            config: {
+                systemInstruction: systemInstruction,
+            }
+        });
+        return response.text;
+    } catch (error) {
+        console.error("Error generating Quidditch Cup message from Gemini:", error);
+        return `Well done, ${userName}! The courage and skill displayed by ${houseName} on the pitch today were truly a sight to behold. A well-deserved victory!`;
+    }
+};
+
 export const getPetMatch = async (answers: string[], apiKey: string): Promise<{ creature: CreatureType, reasoning: string }> => {
     if (!apiKey) {
         // This should not happen if called correctly, but as a fallback

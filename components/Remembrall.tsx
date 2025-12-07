@@ -7,9 +7,10 @@ interface RemembrallProps {
     theme: HouseTheme;
     userName: string;
     addRewards: (amount: number) => void;
+    addHousePoints: (amount: number) => void;
 }
 
-const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userName, addRewards }) => {
+const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userName, addRewards, addHousePoints }) => {
     const [newTask, setNewTask] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +29,8 @@ const Remembrall: React.FC<RemembrallProps> = ({ tasks, setTasks, theme, userNam
         const task = tasks.find(t => t.id === id);
         if (task && !task.completed) {
             // Award points only when completing a task for the first time
-            addRewards(1);
+            addRewards(5);
+            addHousePoints(5);
         }
         setTasks(
             tasks.map(t =>

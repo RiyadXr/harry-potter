@@ -21,6 +21,7 @@ export const getAnimationForItem = (itemId: string): string => {
         case 'sword':
         case 'remembrall':
         case 'cloak':
+        case 'quidditchcup':
             return 'animate-glow-pulse';
 
         // Swirl-in for magical books/clothing
