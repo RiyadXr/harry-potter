@@ -85,11 +85,9 @@ const QuidditchGame: React.FC<{ onGameEnd: (score: number) => void, difficultyLe
         }
     }, [gameState, startCountdown, moveSnitch]);
 
-    // Game Timers and Logic Loop
+    // Bludger movement interval
     useEffect(() => {
         if (gameState !== 'playing') return;
-
-        // Bludger movement interval
         const gameLoop = setInterval(() => {
             setBludgers(prevBludgers => prevBludgers.map(b => {
                 let newX = b.x + b.vx;
@@ -102,22 +100,33 @@ const QuidditchGame: React.FC<{ onGameEnd: (score: number) => void, difficultyLe
                 return { ...b, x: newX, y: newY, vx: newVx, vy: newVy };
             }));
         }, 50);
+        return () => clearInterval(gameLoop);
+    }, [gameState]);
+    
+    // Main game timer countdown
+    useEffect(() => {
+        if (gameState !== 'playing') return;
 
-        // Main game timer
-        const timer = setTimeout(() => {
-            if (timeLeft > 0) {
-                setTimeLeft(t => t - 1);
-            } else {
-                if (snitchTimerRef.current) clearTimeout(snitchTimerRef.current);
-                onGameEnd(score);
-            }
+        const timerId = setInterval(() => {
+            setTimeLeft(prevTime => {
+                if (prevTime > 0) {
+                    return prevTime - 1;
+                }
+                clearInterval(timerId);
+                return 0;
+            });
         }, 1000);
 
-        return () => {
-            clearInterval(gameLoop);
-            clearTimeout(timer);
-        };
-    }, [gameState, timeLeft, onGameEnd, score]);
+        return () => clearInterval(timerId);
+    }, [gameState]);
+    
+    // Game end handler
+    useEffect(() => {
+        if (timeLeft <= 0 && gameState === 'playing') {
+            if (snitchTimerRef.current) clearTimeout(snitchTimerRef.current);
+            onGameEnd(score);
+        }
+    }, [timeLeft, gameState, score, onGameEnd]);
 
     // Snitch appearance loop
     useEffect(() => {
