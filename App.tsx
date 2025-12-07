@@ -79,6 +79,29 @@ const App: React.FC = () => {
 
     // Load all data from local storage on initial render
     useEffect(() => {
+        const APP_VERSION = "1.3.0"; // Increment this version to force a refresh for all users.
+        const storedVersion = localStorage.getItem('appVersion');
+
+        if (storedVersion !== APP_VERSION) {
+            console.log(`App version mismatch. Stored: ${storedVersion}, Current: ${APP_VERSION}. Clearing data and reloading.`);
+            
+            // Preserve the user's API key
+            const apiKey = localStorage.getItem('geminiApiKey');
+            
+            // Clear all stored data from previous versions
+            localStorage.clear();
+            
+            // Restore the API key if it existed
+            if (apiKey) {
+                localStorage.setItem('geminiApiKey', apiKey);
+            }
+
+            // Set the new version and reload the page to get fresh assets
+            localStorage.setItem('appVersion', APP_VERSION);
+            window.location.reload();
+            return; // Stop execution to allow the reload to happen
+        }
+
         try {
             const storedHouse = localStorage.getItem('hogwartsHouse') as House | null;
             if (storedHouse && Object.values(House).includes(storedHouse)) {
@@ -114,7 +137,13 @@ const App: React.FC = () => {
             // House Cup Logic
             let loadedHousePoints: HousePoints = { [House.Gryffindor]: 0, [House.Slytherin]: 0, [House.Ravenclaw]: 0, [House.Hufflepuff]: 0 };
             const storedPoints = localStorage.getItem('housePoints');
-            if (storedPoints) loadedHousePoints = JSON.parse(storedPoints);
+            if (storedPoints) {
+                const parsedPoints = JSON.parse(storedPoints);
+                // Sanitize data to ensure all scores are numbers before use
+                for (const house of Object.values(House)) {
+                    loadedHousePoints[house] = Number(parsedPoints[house]) || 0;
+                }
+            }
 
             const storedContribution = localStorage.getItem('userContribution');
             if(storedContribution) setUserContribution(parseInt(storedContribution, 10));
@@ -132,7 +161,13 @@ const App: React.FC = () => {
             // Quidditch Tournament Logic
             let loadedQuidditchScores: QuidditchScores = { [House.Gryffindor]: 0, [House.Slytherin]: 0, [House.Ravenclaw]: 0, [House.Hufflepuff]: 0 };
             const storedQuidditchScores = localStorage.getItem('quidditchScores');
-            if (storedQuidditchScores) loadedQuidditchScores = JSON.parse(storedQuidditchScores);
+            if (storedQuidditchScores) {
+                const parsedScores = JSON.parse(storedQuidditchScores);
+                 // Sanitize data to ensure all scores are numbers before use
+                for (const house of Object.values(House)) {
+                    loadedQuidditchScores[house] = Number(parsedScores[house]) || 0;
+                }
+            }
             
             const storedQuidditchWinner = localStorage.getItem('lastQuidditchWinner') as House | null;
             if(storedQuidditchWinner) setLastQuidditchWinner(storedQuidditchWinner);
@@ -141,9 +176,9 @@ const App: React.FC = () => {
             const lastQuidditchResetKey = localStorage.getItem('lastQuidditchReset');
 
             if (lastQuidditchResetKey && lastQuidditchResetKey !== todayKey) {
-                const scores = storedQuidditchScores ? JSON.parse(storedQuidditchScores) : loadedQuidditchScores;
+                const scores = storedQuidditchScores ? loadedQuidditchScores : { [House.Gryffindor]: 0, [House.Slytherin]: 0, [House.Ravenclaw]: 0, [House.Hufflepuff]: 0 };
                 if (Object.values(scores).some(s => Number(s) > 0)) {
-                     const winner = Object.keys(scores).reduce((a, b) => (Number(scores[a]) || 0) > (Number(scores[b]) || 0) ? a : b) as House;
+                     const winner = Object.keys(scores).reduce((a, b) => (Number(scores[a as House]) || 0) > (Number(scores[b as House]) || 0) ? a : b) as House;
                      setLastQuidditchWinner(winner);
                      localStorage.setItem('lastQuidditchWinner', winner);
 
