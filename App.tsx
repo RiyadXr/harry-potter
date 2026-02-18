@@ -47,6 +47,7 @@ const App: React.FC = () => {
 
     // Music State
     const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+    const [isAudioUnlocked, setAudioUnlocked] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const musicUrl = 'https://res.cloudinary.com/dgz0hwuyo/video/upload/fl_attachment:Harry_Potter_-_Theme_Song_Hedwig_s_Theme_(mp3.pm)/v1771437686/Harry_Potter_-_Theme_Song_Hedwig_s_Theme__mp3.pm_edlnsj.mp3';
 
@@ -292,41 +293,46 @@ const App: React.FC = () => {
     }, [isLoading, house]);
     
     // --- Audio Management ---
+    // 1. Create the Audio object once when the component mounts
     useEffect(() => {
         if (!audioRef.current) {
-            audioRef.current = new Audio(musicUrl);
-            audioRef.current.loop = true;
-            audioRef.current.volume = 0.2; // Set a pleasant background volume
+            const audio = new Audio(musicUrl);
+            audio.loop = true;
+            audio.volume = 0.2;
+            audioRef.current = audio;
         }
+    }, [musicUrl]);
 
-        const audio = audioRef.current;
-
-        const playAudio = async () => {
-            try {
-                if (audio) {
-                    await audio.play();
-                }
-            } catch (error) {
-                console.log("Autoplay was prevented. Waiting for user interaction.", error);
-                const startOnInteraction = () => {
-                    if (audio && audio.paused && isMusicPlaying) {
-                        audio.play().catch(e => console.error("Could not play audio after interaction:", e));
-                    }
-                };
-                document.addEventListener('click', startOnInteraction, { once: true });
+    // 2. Add a one-time event listener to unlock audio on the first user interaction
+    useEffect(() => {
+        const unlockAudio = () => {
+            if (audioRef.current && audioRef.current.paused) {
+                 setAudioUnlocked(true);
             }
         };
+        
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('keydown', unlockAudio, { once: true });
+        
+        return () => {
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('keydown', unlockAudio);
+        };
+    }, []);
 
-        if (isMusicPlaying) {
-            playAudio();
+    // 3. Control play/pause based on user preference and unlocked state
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        if (isMusicPlaying && isAudioUnlocked) {
+            audio.play().catch(error => {
+                console.error("Audio playback failed. This can happen if the first user interaction wasn't registered correctly.", error);
+            });
         } else {
             audio.pause();
         }
-
-        return () => {
-            document.removeEventListener('click', () => {}); // Clean up listener on unmount
-        };
-    }, [isMusicPlaying]);
+    }, [isMusicPlaying, isAudioUnlocked]);
 
 
     // Save data hooks
