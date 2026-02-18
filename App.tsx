@@ -40,11 +40,16 @@ const App: React.FC = () => {
     const [cupWinMessage, setCupWinMessage] = useState('');
     const [isGeneratingCupMessage, setIsGeneratingCupMessage] = useState(false);
 
-
     // Menagerie state
     const [adoptedCreature, setAdoptedCreature] = useState<CreatureState | null>(null);
     const [foodInventory, setFoodInventory] = useState<Record<string, number>>({});
     const [showWiseOwl, setShowWiseOwl] = useState(true);
+
+    // Music State
+    const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const musicUrl = 'https://res.cloudinary.com/dgz0hwuyo/video/upload/fl_attachment:Harry_Potter_-_Theme_Song_Hedwig_s_Theme_(mp3.pm)/v1771437686/Harry_Potter_-_Theme_Song_Hedwig_s_Theme__mp3.pm_edlnsj.mp3';
+
 
     // Ask the Owl state
     const [isOwlModalOpen, setIsOwlModalOpen] = useState(false);
@@ -133,6 +138,9 @@ const App: React.FC = () => {
 
             const storedShowOwl = localStorage.getItem('showWiseOwl');
             setShowWiseOwl(storedShowOwl ? JSON.parse(storedShowOwl) : true);
+
+            const storedMusicPref = localStorage.getItem('isMusicPlaying');
+            setIsMusicPlaying(storedMusicPref ? JSON.parse(storedMusicPref) : true);
 
             // House Cup Logic
             let loadedHousePoints: HousePoints = { [House.Gryffindor]: 0, [House.Slytherin]: 0, [House.Ravenclaw]: 0, [House.Hufflepuff]: 0 };
@@ -282,6 +290,43 @@ const App: React.FC = () => {
             localStorage.setItem('lastSimulationTimestamp', now.toString());
         }
     }, [isLoading, house]);
+    
+    // --- Audio Management ---
+    useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio(musicUrl);
+            audioRef.current.loop = true;
+            audioRef.current.volume = 0.2; // Set a pleasant background volume
+        }
+
+        const audio = audioRef.current;
+
+        const playAudio = async () => {
+            try {
+                if (audio) {
+                    await audio.play();
+                }
+            } catch (error) {
+                console.log("Autoplay was prevented. Waiting for user interaction.", error);
+                const startOnInteraction = () => {
+                    if (audio && audio.paused && isMusicPlaying) {
+                        audio.play().catch(e => console.error("Could not play audio after interaction:", e));
+                    }
+                };
+                document.addEventListener('click', startOnInteraction, { once: true });
+            }
+        };
+
+        if (isMusicPlaying) {
+            playAudio();
+        } else {
+            audio.pause();
+        }
+
+        return () => {
+            document.removeEventListener('click', () => {}); // Clean up listener on unmount
+        };
+    }, [isMusicPlaying]);
 
 
     // Save data hooks
@@ -293,6 +338,7 @@ const App: React.FC = () => {
     useEffect(() => { if (!isLoading) localStorage.setItem('adoptedCreature', JSON.stringify(adoptedCreature)); }, [adoptedCreature, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('foodInventory', JSON.stringify(foodInventory)); }, [foodInventory, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('showWiseOwl', JSON.stringify(showWiseOwl)); }, [showWiseOwl, isLoading]);
+    useEffect(() => { if (!isLoading) localStorage.setItem('isMusicPlaying', JSON.stringify(isMusicPlaying)); }, [isMusicPlaying, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('housePoints', JSON.stringify(housePoints)); }, [housePoints, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('userContribution', userContribution.toString()); }, [userContribution, isLoading]);
     useEffect(() => { if (!isLoading) localStorage.setItem('quidditchScores', JSON.stringify(quidditchScores)); }, [quidditchScores, isLoading]);
@@ -488,7 +534,7 @@ const App: React.FC = () => {
             case View.Journal: return <Journal entries={journalEntries} setEntries={setJournalEntries} theme={theme} userName={userName} addRewards={addRewards} addHousePoints={addHousePoints} moods={moods} setMoods={setMoods} />;
             case View.Remembrall: return <Remembrall tasks={tasks} setTasks={setTasks} theme={theme} userName={userName} addRewards={addRewards} addHousePoints={addHousePoints} />;
             case View.Decrees: return <DailyDecrees theme={theme} userName={userName} house={house} addRewards={addRewards} addHousePoints={addHousePoints} />;
-            case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} adoptedCreature={adoptedCreature} onAdoptCreature={handleAdoptCreature} showWiseOwl={showWiseOwl} setShowWiseOwl={setShowWiseOwl} />;
+            case View.Requirement: return <Settings theme={theme} house={house} setView={setView} onLeaveHouse={handleLeaveHouse} purchasedItems={purchasedItems} adoptedCreature={adoptedCreature} onAdoptCreature={handleAdoptCreature} showWiseOwl={showWiseOwl} setShowWiseOwl={setShowWiseOwl} isMusicPlaying={isMusicPlaying} setIsMusicPlaying={setIsMusicPlaying} />;
             case View.Sorting: return <SortingHat onSort={handleSort} theme={theme} userName={userName} />;
             case View.Shop: return <Shop theme={theme} rewards={rewards} purchasedItems={purchasedItems} onPurchase={handlePurchaseItem} foodInventory={foodInventory} onPurchaseFood={handlePurchaseFood} adoptedCreature={adoptedCreature} />;
             case View.Menagerie: 

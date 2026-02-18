@@ -15,6 +15,8 @@ interface SettingsProps {
     onAdoptCreature: (creatureId: CreatureType) => void;
     showWiseOwl: boolean;
     setShowWiseOwl: (show: boolean) => void;
+    isMusicPlaying: boolean;
+    setIsMusicPlaying: (isPlaying: boolean) => void;
 }
 
 const Sparkles: React.FC = () => {
@@ -131,7 +133,7 @@ const PetQuizModal: React.FC<PetQuizModalProps> = ({ theme, onClose, onAdopt }) 
 };
 
 
-const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchasedItems, adoptedCreature, onAdoptCreature, showWiseOwl, setShowWiseOwl }) => {
+const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchasedItems, adoptedCreature, onAdoptCreature, showWiseOwl, setShowWiseOwl, isMusicPlaying, setIsMusicPlaying }) => {
     const [isTriviaModalOpen, setIsTriviaModalOpen] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState('');
@@ -254,13 +256,22 @@ const Settings: React.FC<SettingsProps> = ({ theme, house, onLeaveHouse, purchas
                 </div>
 
                 <div className="p-4 rounded-lg bg-black bg-opacity-10">
-                    <h3 className={`font-magic text-xl mb-2 ${theme.accent}`}>Magical Preferences</h3>
-                    <div className="flex items-center justify-between">
-                        <p className="pr-4">Show the Wise Owl for questions.</p>
-                        <label className="switch">
-                            <input type="checkbox" checked={showWiseOwl} onChange={() => setShowWiseOwl(!showWiseOwl)} />
-                            <span className="slider"></span>
-                        </label>
+                    <h3 className={`font-magic text-xl mb-3 ${theme.accent}`}>Magical Preferences</h3>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <p className="pr-4">Show the Wise Owl</p>
+                            <label className="switch">
+                                <input type="checkbox" checked={showWiseOwl} onChange={() => setShowWiseOwl(!showWiseOwl)} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <p className="pr-4">Castle Music</p>
+                            <label className="switch">
+                                <input type="checkbox" checked={isMusicPlaying} onChange={() => setIsMusicPlaying(!isMusicPlaying)} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
